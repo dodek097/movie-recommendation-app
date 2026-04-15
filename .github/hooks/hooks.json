@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "type": "command",
+        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$input | Add-Content -Path 'D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\lab-1\\agent_log.txt'\""
+      }
+    ],
+    "preToolUse": [
+      {
+        "type": "command",
+        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$input | Add-Content -Path 'D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\lab-1\\agent_log.txt'\""
+      }
+    ]
+  }
+}
