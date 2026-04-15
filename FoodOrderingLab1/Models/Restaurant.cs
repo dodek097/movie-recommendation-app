@@ -22,7 +22,7 @@ namespace FoodOrderingLab1.Models
 
         public override string ToString()
         {
-            return $"🍽️  {Name} - Rating: {Rating}/5 - {Address}";
+            return $"[RESTO] {Name} - Rating: {Rating}/5 - {Address}";
         }
     }
 }

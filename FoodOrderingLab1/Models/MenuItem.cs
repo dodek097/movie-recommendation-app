@@ -26,7 +26,7 @@ namespace FoodOrderingLab1.Models
 
         public override string ToString()
         {
-            return $"🍔 {Name} ({Category}) - €{Price} - {Calories}cal";
+            return $"[ITEM] {Name} ({Category}) - {Price}EUR - {Calories}cal";
         }
     }
 }

@@ -23,7 +23,7 @@ namespace FoodOrderingLab1.Models
 
         public override string ToString()
         {
-            return $"📦 Order #{OrderId} - €{TotalPrice} - Status: {Status} - Date: {OrderDate:dd.MM.yyyy HH:mm}";
+            return $"[ORDER] Order #{OrderId} - {TotalPrice}EUR - Status: {Status} - Date: {OrderDate:dd.MM.yyyy HH:mm}";
         }
     }
 }

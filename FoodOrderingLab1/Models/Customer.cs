@@ -22,7 +22,7 @@ namespace FoodOrderingLab1.Models
 
         public override string ToString()
         {
-            return $"👤 {FullName} - {Email} - Registered: {RegisterDate:dd.MM.yyyy}";
+            return $"[USER] {FullName} - {Email} - Registered: {RegisterDate:dd.MM.yyyy}";
         }
     }
 }

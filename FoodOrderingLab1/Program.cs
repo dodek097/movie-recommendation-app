@@ -9,34 +9,34 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        Console.WriteLine("╔════════════════════════════════════════════════════════════╗");
-        Console.WriteLine("║     FOOD ORDERING APP - Lab 1 (C#, LINQ, Async)           ║");
-        Console.WriteLine("╚════════════════════════════════════════════════════════════╝\n");
+        Console.WriteLine("===============================================");
+        Console.WriteLine("  FOOD ORDERING APP - Lab 1 (C#, LINQ, Async)");
+        Console.WriteLine("===============================================\n");
 
         // ============================================
-        // 1️⃣  INICIJALIZACIJA PODATAKA
+        // 1. INICIJALIZACIJA PODATAKA
         // ============================================
-        Console.WriteLine("\n📊 INICIJALIZACIJA PODATAKA:\n");
+        Console.WriteLine("\nINICIJALIZACIJA PODATAKA:\n");
 
         var restaurants = InitializeRestaurants();
         var customers = InitializeCustomers();
         var orders = InitializeOrders(restaurants, customers);
 
         // ============================================
-        // 2️⃣  LINQ UPITI
+        // 2. LINQ UPITI
         // ============================================
-        Console.WriteLine("\n\n📋 LINQ UPITI - DEMONSTRACIJA:\n");
+        Console.WriteLine("\n\nLINQ UPITI - DEMONSTRACIJA:\n");
 
         ExecuteLINQQueries(restaurants, customers, orders);
 
         // ============================================
-        // 3️⃣  ASYNC/AWAIT DEMONSTRACIJA
+        // 3. ASYNC/AWAIT DEMONSTRACIJA
         // ============================================
-        Console.WriteLine("\n\n⚙️  ASYNC/AWAIT DEMONSTRACIJA:\n");
+        Console.WriteLine("\n\nASYNC/AWAIT DEMONSTRACIJA:\n");
         
         await ExecuteAsyncOperations(orders);
 
-        Console.WriteLine("\n\n✅ Lab 1 - Završeno!");
+        Console.WriteLine("\n\n[OK] Lab 1 - Završeno!");
         Console.ReadKey();
     }
 
@@ -189,7 +189,7 @@ class Program
             }
         };
 
-        Console.WriteLine("✅ 3 Restorana inicijalizirano:");
+        Console.WriteLine("[OK] 3 Restorana inicijalizirano:");
         foreach (var r in restaurants)
         {
             Console.WriteLine($"   {r} - {r.MenuItems.Count} jela");
@@ -237,7 +237,7 @@ class Program
             }
         };
 
-        Console.WriteLine("\n✅ 3 Customera inicijalizirano:");
+        Console.WriteLine("\n[OK] 3 Customera inicijalizirano:");
         foreach (var c in customers)
         {
             Console.WriteLine($"   {c}");
@@ -419,7 +419,7 @@ class Program
         order6.TotalPrice = order6.OrderItems.Sum(x => x.TotalItemPrice);
         orders.Add(order6);
 
-        Console.WriteLine("\n✅ 6 Ordere inicijalizirano (Marko: 3, Ana: 2, Ivan: 1)");
+        Console.WriteLine("\n[OK] 6 Ordere inicijalizirano (Marko: 3, Ana: 2, Ivan: 1)");
 
         return orders;
     }
@@ -429,26 +429,26 @@ class Program
     // ============================================
     static void ExecuteLINQQueries(List<Restaurant> restaurants, List<Customer> customers, List<Order> orders)
     {
-        Console.WriteLine("═══════════════════════════════════════════════════════════");
+        Console.WriteLine("===============================================================");
 
-        // 1️⃣  WHERE - Filtriranje
-        Console.WriteLine("\n1️⃣  WHERE - Pronađi sve ordere s statusom 'Delivered':");
+        // 1. WHERE - Filtriranje
+        Console.WriteLine("\n1. WHERE - Pronađi sve ordere s statusom 'Delivered':");
         var deliveredOrders = orders.Where(o => o.Status == OrderStatus.Delivered).ToList();
         foreach (var order in deliveredOrders)
         {
             Console.WriteLine($"   {order}");
         }
 
-        // 2️⃣  OrderBy / OrderByDescending
-        Console.WriteLine("\n2️⃣  OrderBy - Sortiraj ordere po cijeni (opadajuće):");
+        // 2. OrderBy / OrderByDescending
+        Console.WriteLine("\n2. OrderBy - Sortiraj ordere po cijeni (opadajuće):");
         var ordersByPrice = orders.OrderByDescending(o => o.TotalPrice).ToList();
         foreach (var order in ordersByPrice)
         {
-            Console.WriteLine($"   Order #{order.OrderId} - €{order.TotalPrice} - {order.Customer.FirstName}");
+            Console.WriteLine($"   Order #{order.OrderId} - {order.TotalPrice}EUR - {order.Customer.FirstName}");
         }
 
-        // 3️⃣  Count
-        Console.WriteLine("\n3️⃣  Count - Broji ordere po restaurantu:");
+        // 3. Count
+        Console.WriteLine("\n3. Count - Broji ordere po restaurantu:");
         var orderCountByRestaurant = orders.GroupBy(o => o.Restaurant.Name)
                                            .Select(g => new { Restaurant = g.Key, Count = g.Count() });
         foreach (var group in orderCountByRestaurant)
@@ -456,57 +456,57 @@ class Program
             Console.WriteLine($"   {group.Restaurant}: {group.Count} ordere");
         }
 
-        // 4️⃣  Sum - Ukupna vrijednost ordere
-        Console.WriteLine("\n4️⃣  Sum - Ukupna vrijednost svih ordere:");
+        // 4. Sum - Ukupna vrijednost ordere
+        Console.WriteLine("\n4. Sum - Ukupna vrijednost svih ordere:");
         var totalRevenue = orders.Sum(o => o.TotalPrice);
-        Console.WriteLine($"   Ukupno: €{totalRevenue:F2}");
+        Console.WriteLine($"   Ukupno: {totalRevenue:F2}EUR");
 
-        // 5️⃣  Average
-        Console.WriteLine("\n5️⃣  Average - Prosječna vrijednost ordere:");
+        // 5. Average
+        Console.WriteLine("\n5. Average - Prosječna vrijednost ordere:");
         var avgOrderValue = orders.Average(o => o.TotalPrice);
-        Console.WriteLine($"   Prosječno: €{avgOrderValue:F2}");
+        Console.WriteLine($"   Prosječno: {avgOrderValue:F2}EUR");
 
-        // 6️⃣  First / FirstOrDefault
-        Console.WriteLine("\n6️⃣  First - Pronađi prvi pending order:");
+        // 6. First / FirstOrDefault
+        Console.WriteLine("\n6. First - Pronađi prvi pending order:");
         var firstPending = orders.FirstOrDefault(o => o.Status == OrderStatus.Pending);
         if (firstPending != null)
             Console.WriteLine($"   {firstPending}");
 
-        // 7️⃣  Any
-        Console.WriteLine("\n7️⃣  Any - Postoji li restauran s rating > 4.7?");
+        // 7. Any
+        Console.WriteLine("\n7. Any - Postoji li restauran s rating > 4.7?");
         bool hasHighRated = restaurants.Any(r => r.Rating > 4.7m);
-        Console.WriteLine($"   Rezultat: {(hasHighRated ? "DA ✓" : "NE ✗")}");
+        Console.WriteLine($"   Rezultat: {(hasHighRated ? "DA" : "NE")}");
 
-        // 8️⃣  Select / Select Many
-        Console.WriteLine("\n8️⃣  SelectMany - Ispis svih stavki iz svih ordere:");
+        // 8. Select / Select Many
+        Console.WriteLine("\n8. SelectMany - Ispis svih stavki iz svih ordere:");
         var allOrderItems = orders.SelectMany(o => o.OrderItems)
                                   .OrderByDescending(oi => oi.TotalItemPrice);
         foreach (var item in allOrderItems.Take(5))
         {
-            Console.WriteLine($"   {item} (€{item.TotalItemPrice:F2})");
+            Console.WriteLine($"   {item} ({item.TotalItemPrice:F2}EUR)");
         }
 
-        // 9️⃣  GroupBy - Broji ordere po customeru
-        Console.WriteLine("\n9️⃣  GroupBy - Broji ordere po customeru:");
+        // 9. GroupBy - Broji ordere po customeru
+        Console.WriteLine("\n9. GroupBy - Broji ordere po customeru:");
         var ordersByCustomer = orders.GroupBy(o => o.Customer.FullName)
                                      .Select(g => new { Customer = g.Key, OrderCount = g.Count(), TotalSpent = g.Sum(x => x.TotalPrice) });
         foreach (var group in ordersByCustomer.OrderByDescending(g => g.TotalSpent))
         {
-            Console.WriteLine($"   {group.Customer}: {group.OrderCount} ordere - €{group.TotalSpent:F2}");
+            Console.WriteLine($"   {group.Customer}: {group.OrderCount} ordere - {group.TotalSpent:F2}EUR");
         }
 
-        // 🔟 Kompleksniji upit - Top 3 najskupnije stavke
-        Console.WriteLine("\n🔟 Top 3 najskupnije stavke iz menija:");
+        // 10. Kompleksniji upit - Top 3 najskupnije stavke
+        Console.WriteLine("\n10. Top 3 najskupnije stavke iz menija:");
         var topExpensiveItems = restaurants.SelectMany(r => r.MenuItems)
                                            .OrderByDescending(m => m.Price)
                                            .Take(3);
         foreach (var item in topExpensiveItems)
         {
-            Console.WriteLine($"   {item.Name} - €{item.Price}");
+            Console.WriteLine($"   {item.Name} - {item.Price}EUR");
         }
 
-        // 1️⃣1️⃣  Pronađi sve ordere s više od 1 stavke
-        Console.WriteLine("\n1️⃣1️⃣  Orderi s više od 1 stavke:");
+        // 11. Pronađi sve ordere s više od 1 stavke
+        Console.WriteLine("\n11. Orderi s više od 1 stavke:");
         var complexOrders = orders.Where(o => o.OrderItems.Count > 1)
                                  .Select(o => new { o.OrderId, o.Customer.FullName, ItemCount = o.OrderItems.Count });
         foreach (var order in complexOrders)
@@ -514,17 +514,17 @@ class Program
             Console.WriteLine($"   Order #{order.OrderId} ({order.FullName}): {order.ItemCount} stavki");
         }
 
-        // 1️⃣2️⃣  Pronađi menuItems pod €10
-        Console.WriteLine("\n1️⃣2️⃣  Jela ispod €10:");
+        // 12. Pronađi menuItems pod 10EUR
+        Console.WriteLine("\n12. Jela ispod 10EUR:");
         var cheapItems = restaurants.SelectMany(r => r.MenuItems)
                                    .Where(m => m.Price < 10)
                                    .OrderBy(m => m.Price);
         foreach (var item in cheapItems)
         {
-            Console.WriteLine($"   {item.Name} ({item.Category}) - €{item.Price}");
+            Console.WriteLine($"   {item.Name} ({item.Category}) - {item.Price}EUR");
         }
 
-        Console.WriteLine("\n═══════════════════════════════════════════════════════════");
+        Console.WriteLine("\n===============================================================");
     }
 
     // ============================================
@@ -541,7 +541,7 @@ class Program
         await FetchOrderStatusAsync(orders.First());
 
         // Task 3 - Više taskova paralelno
-        Console.WriteLine("\n⚡ Obrađujem više ordere paralelno:");
+        Console.WriteLine("\nObrađujem više ordere paralelno:");
         var tasks = new List<Task>();
         foreach (var order in orders.Take(3))
         {
@@ -549,30 +549,30 @@ class Program
         }
         await Task.WhenAll(tasks);
 
-        Console.WriteLine("\n✅ Svi async taskovi su završeni!");
+        Console.WriteLine("\n[OK] Svi async taskovi su završeni!");
     }
 
     // Async metoda 1 - Slanje ordere
     static async Task SendOrderAsync(Order order)
     {
-        Console.WriteLine($"📤 Slanje ordere #{order.OrderId}...");
+        Console.WriteLine($"[SEND] Slanje ordere #{order.OrderId}...");
         await Task.Delay(1000); // Simulacija slanja
-        Console.WriteLine($"✅ Oredr #{order.OrderId} poslana uspješno!");
+        Console.WriteLine($"[OK] Order #{order.OrderId} poslana uspješno!");
     }
 
     // Async metoda 2 - Dohvat statusa
     static async Task FetchOrderStatusAsync(Order order)
     {
-        Console.WriteLine($"\n📊 Dohvaćam status ordere #{order.OrderId}...");
+        Console.WriteLine($"\n[FETCH] Dohvaćam status ordere #{order.OrderId}...");
         await Task.Delay(800); // Simulacija dohvata
-        Console.WriteLine($"✅ Status ordere #{order.OrderId}: {order.Status}");
+        Console.WriteLine($"[OK] Status ordere #{order.OrderId}: {order.Status}");
     }
 
     // Async metoda 3 - Obrada ordere
     static async Task ProcessOrderAsync(Order order)
     {
-        Console.WriteLine($"   ⏳ Obrađujem order #{order.OrderId} za {order.Customer.FirstName}...");
+        Console.WriteLine($"   [...] Obrađujem order #{order.OrderId} za {order.Customer.FirstName}...");
         await Task.Delay(Random.Shared.Next(500, 1500));
-        Console.WriteLine($"   ✅ Order #{order.OrderId} obrađen!");
+        Console.WriteLine($"   [OK] Order #{order.OrderId} obrađen!");
     }
 }

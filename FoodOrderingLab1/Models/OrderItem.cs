@@ -17,7 +17,7 @@ namespace FoodOrderingLab1.Models
 
         public override string ToString()
         {
-            return $"  • {MenuItem?.Name} x{Quantity} - €{TotalItemPrice:F2}" + 
+            return $"  - {MenuItem?.Name} x{Quantity} - {TotalItemPrice:F2}EUR" + 
                    (string.IsNullOrEmpty(SpecialRequests) ? "" : $" (Note: {SpecialRequests})");
         }
     }
