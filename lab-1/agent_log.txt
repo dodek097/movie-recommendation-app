@@ -106,6 +106,19 @@ Slijedeće korake: Commit na GitHub i MVC aplikacija
                           ✅ LAB 1 - ZAVRŠENO! ✅
 ════════════════════════════════════════════════════════════════════════════════
 
+[2026-04-15 14:40] KREIRANJE .SLN FILE-a
+- Komanda: dotnet new sln -n FoodOrderingApp
+- Status: ✓ FoodOrderingApp.sln kreiran
+- Lokacija: D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingApp.sln
+- Dodana projekta: FoodOrderingLab1/FoodOrderingLab1.csproj
+- Status: ✓ USPJEŠNO
+
+[2026-04-15 14:41] VISUAL STUDIO KOMPATIBILNOST
+- Korisnik sada može otvoriti projekt direktno iz Visual Studija
+- File → Open → Solution
+- Navigiraj do: D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingApp.sln
+- Ili: File → Open → Folder → FoodOrderingApp (root folder)
+
 SAŽETAK:
 ✓ Projekt: FoodOrderingApp (Console, .NET 8.0)
 ✓ 5 Kompleksnih klasa (sve s >5 svojstava, relacijama, ToString)
