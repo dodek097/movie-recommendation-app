@@ -1,12 +1,101 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9862B747-52D5-46F4-B858-5A5984CC67E3}|FoodOrderingLab1\\FoodOrderingLab1.csproj|d:\\desktopd\\repozagit\\movie-recommendation-app\\foodorderinglab1\\models\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9862B747-52D5-46F4-B858-5A5984CC67E3}|FoodOrderingLab1\\FoodOrderingLab1.csproj|solutionrelative:foodorderinglab1\\models\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9862B747-52D5-46F4-B858-5A5984CC67E3}|FoodOrderingLab1\\FoodOrderingLab1.csproj|d:\\desktopd\\repozagit\\movie-recommendation-app\\foodorderinglab1\\models\\menuitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9862B747-52D5-46F4-B858-5A5984CC67E3}|FoodOrderingLab1\\FoodOrderingLab1.csproj|solutionrelative:foodorderinglab1\\models\\menuitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9862B747-52D5-46F4-B858-5A5984CC67E3}|FoodOrderingLab1\\FoodOrderingLab1.csproj|d:\\desktopd\\repozagit\\movie-recommendation-app\\foodorderinglab1\\models\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9862B747-52D5-46F4-B858-5A5984CC67E3}|FoodOrderingLab1\\FoodOrderingLab1.csproj|solutionrelative:foodorderinglab1\\models\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9862B747-52D5-46F4-B858-5A5984CC67E3}|FoodOrderingLab1\\FoodOrderingLab1.csproj|d:\\desktopd\\repozagit\\movie-recommendation-app\\foodorderinglab1\\models\\enums\\orderstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9862B747-52D5-46F4-B858-5A5984CC67E3}|FoodOrderingLab1\\FoodOrderingLab1.csproj|solutionrelative:foodorderinglab1\\models\\enums\\orderstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9862B747-52D5-46F4-B858-5A5984CC67E3}|FoodOrderingLab1\\FoodOrderingLab1.csproj|d:\\desktopd\\repozagit\\movie-recommendation-app\\foodorderinglab1\\models\\enums\\foodcategory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9862B747-52D5-46F4-B858-5A5984CC67E3}|FoodOrderingLab1\\FoodOrderingLab1.csproj|solutionrelative:foodorderinglab1\\models\\enums\\foodcategory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Order.cs",
+              "DocumentMoniker": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\Order.cs",
+              "RelativeDocumentMoniker": "FoodOrderingLab1\\Models\\Order.cs",
+              "ToolTip": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\Order.cs",
+              "RelativeToolTip": "FoodOrderingLab1\\Models\\Order.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T20:30:54.5Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MenuItem.cs",
+              "DocumentMoniker": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\MenuItem.cs",
+              "RelativeDocumentMoniker": "FoodOrderingLab1\\Models\\MenuItem.cs",
+              "ToolTip": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\MenuItem.cs",
+              "RelativeToolTip": "FoodOrderingLab1\\Models\\MenuItem.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T20:30:53.724Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "OrderStatus.cs",
+              "DocumentMoniker": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\Enums\\OrderStatus.cs",
+              "RelativeDocumentMoniker": "FoodOrderingLab1\\Models\\Enums\\OrderStatus.cs",
+              "ToolTip": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\Enums\\OrderStatus.cs",
+              "RelativeToolTip": "FoodOrderingLab1\\Models\\Enums\\OrderStatus.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T20:30:51.05Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "FoodCategory.cs",
+              "DocumentMoniker": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\Enums\\FoodCategory.cs",
+              "RelativeDocumentMoniker": "FoodOrderingLab1\\Models\\Enums\\FoodCategory.cs",
+              "ToolTip": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\Enums\\FoodCategory.cs",
+              "RelativeToolTip": "FoodOrderingLab1\\Models\\Enums\\FoodCategory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T20:30:40.637Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Customer.cs",
+              "DocumentMoniker": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\Customer.cs",
+              "RelativeDocumentMoniker": "FoodOrderingLab1\\Models\\Customer.cs",
+              "ToolTip": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\Customer.cs",
+              "RelativeToolTip": "FoodOrderingLab1\\Models\\Customer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T20:30:33.155Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

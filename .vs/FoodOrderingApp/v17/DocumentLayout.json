@@ -40,7 +40,7 @@
               "RelativeDocumentMoniker": "FoodOrderingLab1\\Models\\Order.cs",
               "ToolTip": "D:\\DESKTOPD\\repozagit\\movie-recommendation-app\\FoodOrderingLab1\\Models\\Order.cs",
               "RelativeToolTip": "FoodOrderingLab1\\Models\\Order.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAdAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-15T20:30:54.5Z",
               "EditorCaption": ""
@@ -55,8 +55,7 @@
               "RelativeToolTip": "FoodOrderingLab1\\Models\\MenuItem.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T20:30:53.724Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-15T20:30:53.724Z"
             },
             {
               "$type": "Document",
@@ -68,8 +67,7 @@
               "RelativeToolTip": "FoodOrderingLab1\\Models\\Enums\\OrderStatus.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T20:30:51.05Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-15T20:30:51.05Z"
             },
             {
               "$type": "Document",
@@ -81,8 +79,7 @@
               "RelativeToolTip": "FoodOrderingLab1\\Models\\Enums\\FoodCategory.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T20:30:40.637Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-15T20:30:40.637Z"
             },
             {
               "$type": "Document",
@@ -94,8 +91,7 @@
               "RelativeToolTip": "FoodOrderingLab1\\Models\\Customer.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T20:30:33.155Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-15T20:30:33.155Z"
             }
           ]
         }
