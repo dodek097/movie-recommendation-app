@@ -1,0 +1,15 @@
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\bin\Debug\net8.0\FoodOrderingLab1.exe
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\bin\Debug\net8.0\FoodOrderingLab1.deps.json
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\bin\Debug\net8.0\FoodOrderingLab1.runtimeconfig.json
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\bin\Debug\net8.0\FoodOrderingLab1.dll
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\bin\Debug\net8.0\FoodOrderingLab1.pdb
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\obj\Debug\net8.0\FoodOrderingLab1.GeneratedMSBuildEditorConfig.editorconfig
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\obj\Debug\net8.0\FoodOrderingLab1.AssemblyInfoInputs.cache
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\obj\Debug\net8.0\FoodOrderingLab1.AssemblyInfo.cs
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\obj\Debug\net8.0\FoodOrderingLab1.csproj.CoreCompileInputs.cache
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\obj\Debug\net8.0\FoodOrderingLab1.sourcelink.json
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\obj\Debug\net8.0\FoodOrderingLab1.dll
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\obj\Debug\net8.0\refint\FoodOrderingLab1.dll
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\obj\Debug\net8.0\FoodOrderingLab1.pdb
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\obj\Debug\net8.0\FoodOrderingLab1.genruntimeconfig.cache
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab1\obj\Debug\net8.0\ref\FoodOrderingLab1.dll
