@@ -94,3 +94,32 @@ Lab 1 je KOMPLETAN I FUNKCIONALAN!
 - Objektni model spremamo za migraciju na ASP.NET Core MVC
 
 Slijedeće korake: Commit na GitHub i MVC aplikacija
+
+[2026-04-15 14:39] GIT COMMIT I PUSH
+- git add . - svi fajlovi dodani
+- git commit - 35 datoteka, 1129 insertions
+- git push origin main - ✓ USPJEŠNO
+- GitHub commit hash: cfaef90
+- Svi fajlovi su dostupni na: https://github.com/dodek097/movie-recommendation-app
+
+════════════════════════════════════════════════════════════════════════════════
+                          ✅ LAB 1 - ZAVRŠENO! ✅
+════════════════════════════════════════════════════════════════════════════════
+
+SAŽETAK:
+✓ Projekt: FoodOrderingApp (Console, .NET 8.0)
+✓ 5 Kompleksnih klasa (sve s >5 svojstava, relacijama, ToString)
+✓ 2 Enuma (FoodCategory, OrderStatus)
+✓ DateTime svojstva (Customer.RegisterDate, Order.OrderDate)
+✓ Ispravne relacije (1-N, N-N)
+✓ 3 Restorana, 9 Jela, 3 Customera, 6 Ordere, 7+ OrderItems
+✓ 12 LINQ Upita (Where, OrderBy, GroupBy, Sum, Average, First, Any, SelectMany, itd.)
+✓ Async/Await (Task, Task.Delay, Task.WhenAll)
+✓ Agent logging u agent_log.txt s detaljnom dokumentacijom
+✓ GitHub deployment - https://github.com/dodek097/movie-recommendation-app
+
+SLJEDEĆE:
+→ ASP.NET Core MVC aplikacija (Web verzija s Controllers, Views, Models)
+→ Korištenje istih klasa iz Console app-a
+→ Database integracija (Entity Framework)
+════════════════════════════════════════════════════════════════════════════════
