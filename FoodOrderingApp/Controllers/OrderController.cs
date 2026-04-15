@@ -16,6 +16,14 @@ namespace FoodOrderingApp.Controllers
             _logger = logger;
         }
 
+        // GET: Order/GetAllOrders
+        [HttpGet]
+        public IActionResult GetAllOrders()
+        {
+            _logger.LogInformation("Retrieving all food orders");
+            return Ok(_orders);
+        }
+
         // GET: Order
         public IActionResult Index()
         {
