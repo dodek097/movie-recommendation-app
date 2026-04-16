@@ -1,0 +1,10 @@
+@model FoodOrderingLab2.ViewModels.MenuItemDetailViewModel
+@{ ViewData["Title"] = Model.MenuItem.Name; }
+<h1>@Model.MenuItem.Name</h1>
+<p>@Model.MenuItem.Description</p>
+<p>Price: @Model.MenuItem.Price.ToString("F2")</p>
+<p>Category: @Model.MenuItem.Category</p>
+<p>Calories: @Model.MenuItem.Calories</p>
+<h3>At: @Model.Restaurant?.Name</h3>
+<p>@Model.Restaurant?.Address</p>
+<a asp-controller="MenuItem" asp-action="Index">Back</a>

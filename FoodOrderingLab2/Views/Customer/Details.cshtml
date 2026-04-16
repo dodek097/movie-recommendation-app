@@ -1,0 +1,18 @@
+@model FoodOrderingLab2.Models.Customer
+@{ ViewData["Title"] = Model.FullName; }
+<h1>@Model.FullName</h1>
+<p>Email: @Model.Email</p>
+<p>Phone: @Model.Phone</p>
+<p>Address: @Model.Address</p>
+<p>Member since: @Model.RegisterDate.ToString("MMM dd, yyyy")</p>
+<h2>Orders</h2>
+@if (Model?.Orders?.Count > 0) {
+    <ul>
+    @foreach (var order in Model.Orders) {
+        <li>Order #@order.OrderId - @order.Status - @order.TotalPrice.ToString("F2") <a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId">View</a></li>
+    }
+    </ul>
+} else {
+    <p>No orders yet.</p>
+}
+<a asp-controller="Customer" asp-action="Index">Back</a>

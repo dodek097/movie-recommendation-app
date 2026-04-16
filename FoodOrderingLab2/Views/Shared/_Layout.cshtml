@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Food Ordering App</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="app-header">
+        <nav class="navbar-custom">
+            <div class="nav-container">
+                <!-- Logo/Brand -->
+                <div class="nav-brand">
+                    <a asp-controller="Home" asp-action="Index" class="brand-link">
+                        <span class="brand-text">FoodOrder</span>
+                    </a>
+                </div>
+
+                <!-- Main Navigation Links -->
+                <div class="nav-links">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a asp-controller="Home" asp-action="Index" class="nav-link">
+                                Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Restaurant" asp-action="Index" class="nav-link">
+                                Restaurants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="MenuItem" asp-action="Index" class="nav-link">
+                                Menu Items
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Order" asp-action="Index" class="nav-link">
+                                Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Customer" asp-action="Index" class="nav-link">
+                                Customers
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Breadcrumbs Navigation -->
+    @if (ViewData["Breadcrumbs"] != null)
+    {
+        <nav class="breadcrumbs-container" aria-label="Breadcrumb">
+            <ol class="breadcrumbs">
+                @foreach (var breadcrumb in (List<(string text, string url)>)ViewData["Breadcrumbs"])
+                {
+                    <li class="breadcrumb-item">
+                        @if (!string.IsNullOrEmpty(breadcrumb.url))
+                        {
+                            <a href="@breadcrumb.url">@breadcrumb.text</a>
+                        }
+                        else
+                        {
+                            <span>@breadcrumb.text</span>
+                        }
+                    </li>
+                }
+            </ol>
+        </nav>
+    }
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3 class="footer-title">FoodOrder App</h3>
+                <p class="footer-text">Quality food, delivered with care.</p>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-subtitle">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="Restaurant" asp-action="Index">Restaurants</a></li>
+                    <li><a asp-controller="MenuItem" asp-action="Index">Menu</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-subtitle">Contact</h4>
+                <p class="footer-text">Email: info@foodorder.com</p>
+                <p class="footer-text">Phone: +1 (555) 123-4567</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 FoodOrder App. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+
+
+
+

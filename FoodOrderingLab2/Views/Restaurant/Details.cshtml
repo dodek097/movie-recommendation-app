@@ -1,0 +1,17 @@
+@model FoodOrderingLab2.ViewModels.RestaurantDetailViewModel
+@{ ViewData["Title"] = Model.Restaurant.Name; }
+<h1>@Model.Restaurant.Name</h1>
+<p>Rating: @Model.Restaurant.Rating</p>
+<p>@Model.Restaurant.Address</p>
+<h2>Menu Items</h2>
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+@foreach (var item in Model.MenuItems) {
+    <div style="border: 1px solid #ff6b35; padding: 10px;">
+        <h4>@item.Name</h4>
+        <p>@item.Description</p>
+        <p>@item.Price.ToString("F2")</p>
+        <a asp-controller="MenuItem" asp-action="Details" asp-route-id="@item.MenuItemId">View</a>
+    </div>
+}
+</div>
+<a asp-controller="Restaurant" asp-action="Index">Back</a>

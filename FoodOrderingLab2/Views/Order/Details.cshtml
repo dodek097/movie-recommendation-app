@@ -1,0 +1,14 @@
+@model FoodOrderingLab2.ViewModels.OrderDetailViewModel
+@{ ViewData["Title"] = "Order #" + Model.Order.OrderId; }
+<h1>Order #@Model.Order.OrderId</h1>
+<p>Status: @Model.Order.Status</p>
+<h3>Customer: @Model.Customer?.FullName</h3>
+<h3>Restaurant: @Model.Restaurant?.Name</h3>
+<h3>Items</h3>
+<ul>
+@foreach (var item in Model.OrderItems) {
+    <li>@item.MenuItem?.Name x@item.Quantity = @item.TotalItemPrice.ToString("F2")</li>
+}
+</ul>
+<h3>Total: @Model.Order.TotalPrice.ToString("F2")</h3>
+<a asp-controller="Order" asp-action="Index">Back</a>

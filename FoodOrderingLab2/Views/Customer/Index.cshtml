@@ -1,0 +1,13 @@
+@model List<FoodOrderingLab2.Models.Customer>
+@{ ViewData["Title"] = "Customers"; }
+<h1>All Customers</h1>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+@foreach (var customer in Model) {
+    <div style="border: 1px solid #444; padding: 12px;">
+        <h3>@customer.FullName</h3>
+        <p>@customer.Email</p>
+        <p>@customer.Phone</p>
+        <a asp-controller="Customer" asp-action="Details" asp-route-id="@customer.CustomerId">View</a>
+    </div>
+}
+</div>
