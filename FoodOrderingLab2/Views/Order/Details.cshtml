@@ -1,14 +1,45 @@
 @model FoodOrderingLab2.ViewModels.OrderDetailViewModel
 @{ ViewData["Title"] = "Order #" + Model.Order.OrderId; }
-<h1>Order #@Model.Order.OrderId</h1>
-<p>Status: @Model.Order.Status</p>
-<h3>Customer: @Model.Customer?.FullName</h3>
-<h3>Restaurant: @Model.Restaurant?.Name</h3>
-<h3>Items</h3>
-<ul>
-@foreach (var item in Model.OrderItems) {
-    <li>@item.MenuItem?.Name x@item.Quantity = @item.TotalItemPrice.ToString("F2")</li>
-}
-</ul>
-<h3>Total: @Model.Order.TotalPrice.ToString("F2")</h3>
-<a asp-controller="Order" asp-action="Index">Back</a>
+<section class="detail-page">
+    <div class="card detail-card">
+        <div class="detail-card-header">
+            <div>
+                <span class="detail-subtitle">Order details</span>
+                <h1>Order #@Model.Order.OrderId</h1>
+            </div>
+            <div class="detail-meta">
+                <span>Status: <strong>@Model.Order.Status</strong></span>
+                <span>Total: <strong>@Model.Order.TotalPrice.ToString("F2")</strong></span>
+                <span>Date: <strong>@Model.Order.OrderDate.ToString("MMM dd, yyyy")</strong></span>
+            </div>
+        </div>
+
+        <div class="detail-two-col detail-section">
+            <div>
+                <h2>Customer</h2>
+                <p class="detail-subtitle">@Model.Customer?.FullName</p>
+                <p>@Model.Customer?.Email</p>
+                <p>@Model.Customer?.Phone</p>
+            </div>
+            <div>
+                <h2>Restaurant</h2>
+                <p class="detail-subtitle">@Model.Restaurant?.Name</p>
+                <p>@Model.Restaurant?.Address</p>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h2>Items</h2>
+            <ul class="detail-list">
+                @foreach (var item in Model.OrderItems)
+                {
+                    <li>@item.MenuItem?.Name x@item.Quantity = @item.TotalItemPrice.ToString("F2")</li>
+                }
+            </ul>
+        </div>
+
+        <div class="detail-action">
+            <a class="btn btn-secondary" asp-controller="Order" asp-action="Index">Back to orders</a>
+        </div>
+    </div>
+</section>

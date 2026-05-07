@@ -1,17 +1,39 @@
 @model FoodOrderingLab2.ViewModels.RestaurantDetailViewModel
 @{ ViewData["Title"] = Model.Restaurant.Name; }
-<h1>@Model.Restaurant.Name</h1>
-<p>Rating: @Model.Restaurant.Rating</p>
-<p>@Model.Restaurant.Address</p>
-<h2>Menu Items</h2>
-<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-@foreach (var item in Model.MenuItems) {
-    <div style="border: 1px solid #ff6b35; padding: 10px;">
-        <h4>@item.Name</h4>
-        <p>@item.Description</p>
-        <p>@item.Price.ToString("F2")</p>
-        <a asp-controller="MenuItem" asp-action="Details" asp-route-id="@item.MenuItemId">View</a>
+<section class="detail-page">
+    <div class="card detail-card">
+        <div class="detail-card-header">
+            <div>
+                <span class="detail-subtitle">Restaurant</span>
+                <h1>@Model.Restaurant.Name</h1>
+                <p class="detail-subtitle">@Model.Restaurant.Address</p>
+            </div>
+            <div class="detail-meta">
+                <span>Rating: <strong>@Model.Restaurant.Rating</strong></span>
+                <span>Hours: <strong>@Model.Restaurant.OpeningHours</strong></span>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h2>Menu Items</h2>
+            <div class="detail-grid-2">
+                @foreach (var item in Model.MenuItems)
+                {
+                    <div class="detail-mini-card">
+                        <h4>@item.Name</h4>
+                        <p>@item.Description</p>
+                        <div class="detail-meta">
+                            <span>Price: <strong>@item.Price.ToString("F2")</strong></span>
+                            <span>Category: <strong>@item.Category</strong></span>
+                        </div>
+                        <a class="btn btn-outline" asp-controller="MenuItem" asp-action="Details" asp-route-id="@item.MenuItemId">View details</a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="detail-action">
+            <a class="btn btn-secondary" asp-controller="Restaurant" asp-action="Index">Back to restaurants</a>
+        </div>
     </div>
-}
-</div>
-<a asp-controller="Restaurant" asp-action="Index">Back</a>
+</section>

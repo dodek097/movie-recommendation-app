@@ -197,6 +197,84 @@ Sadrži:
 
 Lab 2 je spreman! 🎉
 
+===============================================
+FOOD ORDERING LAB 3 - AGENT LOG
+===============================================
+Lab 3 - EF Core, Routing, Documentation
+
+Projekt: FoodOrderingLab2
+.NET verzija: 8.0
+Početak: 2026-05-07
+
+===============================================
+FAZA 1 - EF CORE MIGRACIJA
+===============================================
+[2026-05-07] EF konfiguracija dovršena
+- Dodan `ApplicationDbContext` u `FoodOrderingLab2/Data/ApplicationDbContext.cs`
+- Dodani DbSet-ovi za `Customer`, `Restaurant`, `MenuItem`, `Order`, `OrderItem`
+- Konfigurirane relacije i `DeleteBehavior.Restrict` za `OrderItem`
+- Ažuriran `Program.cs` za DI i SQL Server connection string
+
+[2026-05-07] Generirana inicijalna migracija
+- Kreirana `Migrations/20260507134735_InitialCreate.cs`
+- `dotnet ef database update --context ApplicationDbContext` izvršen uspješno
+- Baza `FoodOrderingLab3Db` stvorena u SQL Server Docker instanci
+
+===============================================
+FAZA 2 - PRELAZAK NA EF REPOSITORY
+===============================================
+[2026-05-07] Repo migracija dovršena
+- Stvarani EF repozitoriji: `RestaurantRepository`, `MenuItemRepository`, `OrderRepository`, `CustomerRepository`
+- Kontroleri su ažurirani da koriste EF repozitorije umjesto mock podataka
+- `HomeController` prebačen na `RestaurantRepository`
+
+[2026-05-07] Cleanup legacy koda
+- Uklonjene stare mock repository datoteke iz `FoodOrderingLab2/Repositories/`
+- Provjereno da nema runtime reference na `*MockRepository`
+
+===============================================
+FAZA 3 - ROUTING I DOKUMENTACIJA
+===============================================
+[2026-05-07] Atributno routanje potvrđeno
+- `RestaurantController`: `/restorani`, `/restorani/{id}`
+- `MenuItemController`: `/meni`, `/meni/restoran/{restaurantId}`, `/meni/{id}`
+- `OrderController`: `/narudzbe`, `/narudzbe/{id}`
+- `CustomerController`: `/kupci`, `/kupci/{id}`
+
+[2026-05-07] Dokumentacija kreirana
+- Kreiran `FoodOrderingLab2/semantic-model.md`
+- Kreiran `FoodOrderingLab2/sitemap.md`
+- Potvrđena postojeća skill konfiguracija: `.github/skills/entity-framework/SKILL.md`
+
+===============================================
+FAZA 4 - UI DORADA
+===============================================
+[2026-05-07] Poboljšani detaljni prikazi
+- Ažurirani `Views/*/Details.cshtml` za ljepši layout
+- Dodan CSS za `detail-card`, `detail-section`, `detail-meta`, `detail-mini-card`
+- Očuvani glavni stil bez velikih promjena
+
+===============================================
+FAZA 5 - BUILD I VALIDACIJA
+===============================================
+[2026-05-07] Validacija projekta
+- `dotnet build` iz `FoodOrderingLab2` uspješno prošao
+- `FoodOrderingLab2.sln` je potvrđena i radi
+- Aplikacija pokreće projekt s EF bazom i detaljnim view-ima
+
+===============================================
+SUMMARY LAB 3
+===============================================
+✅ Prebačen app s mock repository na EF repository
+✅ Generirana i primijenjena inicijalna EF migracija
+✅ Kreiran `semantic-model.md` i `sitemap.md`
+✅ Potvrđena `.github/skills/entity-framework/SKILL.md`
+✅ Uklonjene legacy mock repository datoteke
+✅ Poboljšan UI detaljnih stranica
+
+Lab 3 je spreman za testiranje i predaju.
+
+
 
 [UX SUB-AGENT - 2026-04-16]
 Stranica: Master Layout & Global Styles
@@ -309,4 +387,10 @@ Sve stranice koriste:
 
 Status: FULLY IMPLEMENTED ✓
 
+
+
+===============================================
+FOOD ORDERING LAB 3 - AGENT LOG
+===============================================
+[2026-05-07] Starting Lab 3 implementation: EF Core integration, routing, repository migration, semantic docs.
 

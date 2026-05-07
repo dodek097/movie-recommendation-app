@@ -330,6 +330,120 @@ body {
   flex-wrap: wrap;
 }
 
+.detail-page {
+  padding: var(--spacing-lg) 0;
+}
+
+.detail-card {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.detail-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-lg);
+}
+
+.detail-card-header h1 {
+  margin-bottom: var(--spacing-xs);
+}
+
+.detail-subtitle {
+  color: var(--color-text-light);
+  font-size: 1rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  font-size: 0.95rem;
+}
+
+.detail-meta span {
+  color: var(--color-text-light);
+}
+
+.detail-meta strong {
+  color: var(--color-accent);
+}
+
+.detail-section {
+  padding: var(--spacing-md) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.detail-section:first-of-type {
+  border-top: none;
+}
+
+.detail-section h2 {
+  margin-bottom: var(--spacing-sm);
+}
+
+.detail-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.detail-mini-card {
+  background: var(--color-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.detail-mini-card h4 {
+  color: var(--color-text);
+}
+
+.detail-mini-card p {
+  color: var(--color-text-light);
+  margin: 0;
+}
+
+.detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.detail-list li {
+  background: var(--color-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.detail-two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.detail-action {
+  margin-top: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+  .detail-two-col,
+  .detail-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ============================= */
 /* GRID LAYOUT                   */
 /* ============================= */

@@ -212,18 +212,18 @@ namespace FoodOrderingLab2.Data
                     {
                         OrderItemId = 1,
                         MenuItemId = 1,
-                        MenuItem = restaurants[0].MenuItems[0],
+                        MenuItem = restaurants[0].MenuItems.ElementAt(0),
                         Quantity = 2,
-                        UnitPrice = restaurants[0].MenuItems[0].Price,
+                        UnitPrice = restaurants[0].MenuItems.ElementAt(0).Price,
                         SpecialRequests = "Extra cheese"
                     },
                     new OrderItem
                     {
                         OrderItemId = 2,
                         MenuItemId = 3,
-                        MenuItem = restaurants[0].MenuItems[2],
+                        MenuItem = restaurants[0].MenuItems.ElementAt(2),
                         Quantity = 1,
-                        UnitPrice = restaurants[0].MenuItems[2].Price,
+                        UnitPrice = restaurants[0].MenuItems.ElementAt(2).Price,
                         SpecialRequests = null
                     }
                 }
@@ -246,9 +246,9 @@ namespace FoodOrderingLab2.Data
                     {
                         OrderItemId = 3,
                         MenuItemId = 4,
-                        MenuItem = restaurants[1].MenuItems[0],
+                        MenuItem = restaurants[1].MenuItems.ElementAt(0),
                         Quantity = 1,
-                        UnitPrice = restaurants[1].MenuItems[0].Price,
+                        UnitPrice = restaurants[1].MenuItems.ElementAt(0).Price,
                         SpecialRequests = null
                     }
                 }
@@ -271,18 +271,18 @@ namespace FoodOrderingLab2.Data
                     {
                         OrderItemId = 4,
                         MenuItemId = 7,
-                        MenuItem = restaurants[2].MenuItems[0],
+                        MenuItem = restaurants[2].MenuItems.ElementAt(0),
                         Quantity = 2,
-                        UnitPrice = restaurants[2].MenuItems[0].Price,
+                        UnitPrice = restaurants[2].MenuItems.ElementAt(0).Price,
                         SpecialRequests = "No dressing"
                     },
                     new OrderItem
                     {
                         OrderItemId = 5,
                         MenuItemId = 9,
-                        MenuItem = restaurants[2].MenuItems[2],
+                        MenuItem = restaurants[2].MenuItems.ElementAt(2),
                         Quantity = 1,
-                        UnitPrice = restaurants[2].MenuItems[2].Price,
+                        UnitPrice = restaurants[2].MenuItems.ElementAt(2).Price,
                         SpecialRequests = null
                     }
                 }
@@ -306,9 +306,9 @@ namespace FoodOrderingLab2.Data
                     {
                         OrderItemId = 6,
                         MenuItemId = 2,
-                        MenuItem = restaurants[0].MenuItems[1],
+                        MenuItem = restaurants[0].MenuItems.ElementAt(1),
                         Quantity = 1,
-                        UnitPrice = restaurants[0].MenuItems[1].Price,
+                        UnitPrice = restaurants[0].MenuItems.ElementAt(1).Price,
                         SpecialRequests = null
                     }
                 }
@@ -331,18 +331,18 @@ namespace FoodOrderingLab2.Data
                     {
                         OrderItemId = 7,
                         MenuItemId = 5,
-                        MenuItem = restaurants[1].MenuItems[1],
+                        MenuItem = restaurants[1].MenuItems.ElementAt(1),
                         Quantity = 2,
-                        UnitPrice = restaurants[1].MenuItems[1].Price,
+                        UnitPrice = restaurants[1].MenuItems.ElementAt(1).Price,
                         SpecialRequests = "Spicy"
                     },
                     new OrderItem
                     {
                         OrderItemId = 8,
                         MenuItemId = 6,
-                        MenuItem = restaurants[1].MenuItems[2],
+                        MenuItem = restaurants[1].MenuItems.ElementAt(2),
                         Quantity = 2,
-                        UnitPrice = restaurants[1].MenuItems[2].Price,
+                        UnitPrice = restaurants[1].MenuItems.ElementAt(2).Price,
                         SpecialRequests = null
                     }
                 }
@@ -366,9 +366,9 @@ namespace FoodOrderingLab2.Data
                     {
                         OrderItemId = 9,
                         MenuItemId = 8,
-                        MenuItem = restaurants[2].MenuItems[1],
+                        MenuItem = restaurants[2].MenuItems.ElementAt(1),
                         Quantity = 1,
-                        UnitPrice = restaurants[2].MenuItems[1].Price,
+                        UnitPrice = restaurants[2].MenuItems.ElementAt(1).Price,
                         SpecialRequests = null
                     }
                 }
@@ -391,9 +391,9 @@ namespace FoodOrderingLab2.Data
                     {
                         OrderItemId = 10,
                         MenuItemId = 1,
-                        MenuItem = restaurants[0].MenuItems[0],
+                        MenuItem = restaurants[0].MenuItems.ElementAt(0),
                         Quantity = 1,
-                        UnitPrice = restaurants[0].MenuItems[0].Price,
+                        UnitPrice = restaurants[0].MenuItems.ElementAt(0).Price,
                         SpecialRequests = "Well done"
                     }
                 }

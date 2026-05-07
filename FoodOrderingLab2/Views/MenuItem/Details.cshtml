@@ -1,10 +1,31 @@
 @model FoodOrderingLab2.ViewModels.MenuItemDetailViewModel
 @{ ViewData["Title"] = Model.MenuItem.Name; }
-<h1>@Model.MenuItem.Name</h1>
-<p>@Model.MenuItem.Description</p>
-<p>Price: @Model.MenuItem.Price.ToString("F2")</p>
-<p>Category: @Model.MenuItem.Category</p>
-<p>Calories: @Model.MenuItem.Calories</p>
-<h3>At: @Model.Restaurant?.Name</h3>
-<p>@Model.Restaurant?.Address</p>
-<a asp-controller="MenuItem" asp-action="Index">Back</a>
+<section class="detail-page">
+    <div class="card detail-card">
+        <div class="detail-card-header">
+            <div>
+                <span class="detail-subtitle">Menu item</span>
+                <h1>@Model.MenuItem.Name</h1>
+            </div>
+            <div class="detail-meta">
+                <span>Price: <strong>@Model.MenuItem.Price.ToString("F2")</strong></span>
+                <span>Calories: <strong>@Model.MenuItem.Calories</strong></span>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h2>Description</h2>
+            <p>@Model.MenuItem.Description</p>
+        </div>
+
+        <div class="detail-section">
+            <h2>Restaurant</h2>
+            <p class="detail-subtitle">@Model.Restaurant?.Name</p>
+            <p>@Model.Restaurant?.Address</p>
+        </div>
+
+        <div class="detail-action">
+            <a class="btn btn-secondary" asp-controller="MenuItem" asp-action="Index">Back to menu</a>
+        </div>
+    </div>
+</section>

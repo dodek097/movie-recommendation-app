@@ -4,25 +4,28 @@ using FoodOrderingLab2.ViewModels;
 
 namespace FoodOrderingLab2.Controllers
 {
+    [Route("narudzbe")]
     public class OrderController : Controller
     {
-        private readonly OrderMockRepository _orderRepository;
-        private readonly RestaurantMockRepository _restaurantRepository;
-        private readonly CustomerMockRepository _customerRepository;
+        private readonly OrderRepository _orderRepository;
+        private readonly RestaurantRepository _restaurantRepository;
+        private readonly CustomerRepository _customerRepository;
 
-        public OrderController(OrderMockRepository orderRepository, RestaurantMockRepository restaurantRepository, CustomerMockRepository customerRepository)
+        public OrderController(OrderRepository orderRepository, RestaurantRepository restaurantRepository, CustomerRepository customerRepository)
         {
             _orderRepository = orderRepository;
             _restaurantRepository = restaurantRepository;
             _customerRepository = customerRepository;
         }
 
+        [Route("")]
         public IActionResult Index()
         {
             var orders = _orderRepository.GetAll();
             return View(orders);
         }
 
+        [Route("{id:int}")]
         public IActionResult Details(int id)
         {
             var order = _orderRepository.GetById(id);
@@ -39,7 +42,7 @@ namespace FoodOrderingLab2.Controllers
                 Order = order,
                 Customer = customer,
                 Restaurant = restaurant,
-                OrderItems = order.OrderItems
+                OrderItems = order.OrderItems.ToList()
             };
 
             return View(viewModel);

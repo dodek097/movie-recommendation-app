@@ -1,17 +1,30 @@
+using FoodOrderingLab2.Data;
 using FoodOrderingLab2.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Register Mock Repositories
-builder.Services.AddSingleton<RestaurantMockRepository>();
-builder.Services.AddSingleton<MenuItemMockRepository>();
-builder.Services.AddSingleton<OrderMockRepository>();
-builder.Services.AddSingleton<CustomerMockRepository>();
+// Configure EF DbContext for SQL Server
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register EF-backed repositories
+builder.Services.AddScoped<RestaurantRepository>();
+builder.Services.AddScoped<MenuItemRepository>();
+builder.Services.AddScoped<OrderRepository>();
+builder.Services.AddScoped<CustomerRepository>();
 
 var app = builder.Build();
+
+// Seed database on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    DatabaseSeeder.Seed(dbContext);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -4,17 +4,20 @@ using FoodOrderingLab2.ViewModels;
 
 namespace FoodOrderingLab2.Controllers
 {
+    [Route("meni")]
     public class MenuItemController : Controller
     {
-        private readonly MenuItemMockRepository _menuItemRepository;
-        private readonly RestaurantMockRepository _restaurantRepository;
+        private readonly MenuItemRepository _menuItemRepository;
+        private readonly RestaurantRepository _restaurantRepository;
 
-        public MenuItemController(MenuItemMockRepository menuItemRepository, RestaurantMockRepository restaurantRepository)
+        public MenuItemController(MenuItemRepository menuItemRepository, RestaurantRepository restaurantRepository)
         {
             _menuItemRepository = menuItemRepository;
             _restaurantRepository = restaurantRepository;
         }
 
+        [Route("")]
+        [Route("restoran/{restaurantId:int}")]
         public IActionResult Index(int restaurantId = 0)
         {
             List<Models.MenuItem> menuItems;
@@ -31,6 +34,7 @@ namespace FoodOrderingLab2.Controllers
             return View(menuItems);
         }
 
+        [Route("{id:int}")]
         public IActionResult Details(int id)
         {
             var menuItem = _menuItemRepository.GetById(id);

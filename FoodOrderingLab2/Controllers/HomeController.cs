@@ -5,9 +5,9 @@ namespace FoodOrderingLab2.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly RestaurantMockRepository _restaurantRepository;
+        private readonly RestaurantRepository _restaurantRepository;
 
-        public HomeController(RestaurantMockRepository restaurantRepository)
+        public HomeController(RestaurantRepository restaurantRepository)
         {
             _restaurantRepository = restaurantRepository;
         }
