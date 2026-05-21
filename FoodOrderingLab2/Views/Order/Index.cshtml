@@ -1,23 +1,23 @@
 @model List<FoodOrderingLab2.Models.Order>
 @{ ViewData["Title"] = "Orders"; }
 
-<div class="page-header">
+<div class="page-header page-header-center">
     <h1>Narudžbe</h1>
-    <a asp-controller="Order" asp-action="Create" class="btn-primary">+ Kreiraj narudžbu</a>
+    <a asp-controller="Order" asp-action="Create" class="btn btn-primary btn-large">+ Kreiraj narudžbu</a>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+<div class="order-grid">
 @foreach (var order in Model) {
-    <div style="border: 1px solid #444; padding: 15px;">
+    <div class="order-card">
         <h3>Narudžba #@order.OrderId</h3>
         <p><strong>Kupac:</strong> @order.Customer?.FullName</p>
         <p><strong>Restoran:</strong> @order.Restaurant?.Name</p>
         <p><strong>Status:</strong> @order.Status</p>
         <p><strong>Cijena:</strong> @order.TotalPrice.ToString("F2") EUR</p>
         <p><strong>Datum:</strong> @order.OrderDate.ToString("d.M.yyyy H:mm")</p>
-        <div style="margin-top: 10px; display: flex; gap: 8px;">
-            <a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="btn-secondary">Pregled</a>
-            <a asp-controller="Order" asp-action="Edit" asp-route-id="@order.OrderId" class="btn-secondary">Uredi</a>
+        <div class="btn-group-inline" style="margin-top: 10px;">
+            <a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-secondary">Pregled</a>
+            <a asp-controller="Order" asp-action="Edit" asp-route-id="@order.OrderId" class="btn btn-secondary">Uredi</a>
         </div>
     </div>
 }

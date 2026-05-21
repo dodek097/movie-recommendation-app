@@ -220,6 +220,14 @@ FAZA 1 - EF CORE MIGRACIJA
 - `dotnet ef database update --context ApplicationDbContext` izvršen uspješno
 - Baza `FoodOrderingLab3Db` stvorena u SQL Server Docker instanci
 
+[2026-05-21 20:30] Implemented Order Edit with inline items:
+- Converted `OrderController.Edit` (GET/POST) to use `OrderCreateViewModel` and map existing `OrderItem`s into `Items` for the edit form.
+- Injected `MenuItemRepository` into `OrderController` and used it server-side to resolve authoritative `UnitPrice` when creating/updating items.
+- Updated `Views/Order/Edit.cshtml` to render pre-populated item rows and reuse the dynamic add/remove JS from Create view.
+- Build verified: `dotnet build` succeeded after changes.
+
+Next steps: add client-side validation for item rows and small UX feedback (toasts/spinners).
+
 ===============================================
 FAZA 2 - PRELAZAK NA EF REPOSITORY
 ===============================================
@@ -395,4 +403,16 @@ FOOD ORDERING LAB 3 - AGENT LOG
 [2026-05-07] Starting Lab 3 implementation: EF Core integration, routing, repository migration, semantic docs.
 
 [2026-05-21] Starting Lab 4 implementation: added shared partials (`_AutocompletePartial`, `_DateTimePartial`), included select2/flatpickr via CDN, added `autocomplete.js` and `datetime.js`, and implemented simple AJAX search endpoints for Customer, Restaurant and MenuItem controllers. Working on integrating these into Create/Edit views next.
+
+[2026-05-21 20:10] Implemented inline OrderItem creation for Orders Create view:
+- Added `ViewModels/OrderCreateViewModel` and `ViewModels/OrderItemCreateModel` to bind order + items from the form.
+- Updated `OrderController.Create` (GET/POST) to accept `OrderCreateViewModel`, map posted items to `OrderItem` entities, compute `TotalPrice` server-side from `UnitPrice * Quantity`, and persist via `OrderRepository`.
+- Updated `Views/Order/Create.cshtml` to provide a dynamic table of order items with an "Add item" button, row template, and simple JS to add/remove rows. Each item row uses a select2 autocomplete for menu items (`/meni/search`).
+
+Notes:
+- Server looks up selected `MenuItem` price from the chosen restaurant's `MenuItems` collection when computing `UnitPrice`.
+- Client does not send `UnitPrice` — price is authoritative on server.
+- Build tested: `dotnet build` succeeded after these changes (warnings only).
+
+Next steps: implement Edit flow for items, improve client-side validation for item rows, and add saving feedback (toasts).
 

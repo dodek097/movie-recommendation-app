@@ -5,18 +5,26 @@
             var api = $el.data('api');
             if (!api) return;
 
-            $el.select2({
+            var placeholderText = $el.data('placeholder') || 'Type to search...';
+            var dropdownClass = $el.hasClass('item-menu') ? 'item-menu-dropdown' : '';
+            var selectOptions = {
                 ajax: {
                     url: api,
                     dataType: 'json',
                     delay: 250,
-                    data: function(params){ return { q: params.term }; },
+                    data: function(params){ return { q: params.term || '' }; },
                     processResults: function(data){ return { results: data }; }
                 },
-                minimumInputLength: 1,
+                dropdownParent: $('body'),
+                minimumInputLength: 0,
                 width: '100%',
-                placeholder: 'Type to search...'
-            });
+                placeholder: placeholderText,
+                allowClear: true
+            };
+            if (dropdownClass) {
+                selectOptions.dropdownCssClass = dropdownClass;
+            }
+            $el.select2(selectOptions);
         }
 
         $('.autocomplete-select').each(function(){ initSelect(this); });

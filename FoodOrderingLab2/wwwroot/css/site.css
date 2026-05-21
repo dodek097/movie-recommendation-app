@@ -580,18 +580,26 @@ a:hover {
 .btn-primary {
   background-color: var(--color-accent);
   color: var(--color-primary);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.28s ease, background-color 0.28s ease, box-shadow 0.28s ease, color 0.28s ease;
+  border: 1px solid rgba(255, 107, 53, 0.8);
 }
 
 .btn-primary:hover,
 .btn-primary:active {
   background-color: var(--color-accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  color: var(--color-primary);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 18px 32px rgba(255, 107, 53, 0.35);
 }
 
 .btn-primary:active {
   background-color: var(--color-accent-dark);
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+}
+
+.btn-primary:hover {
+  text-shadow: 0 1px 2px rgba(255,255,255,0.2);
 }
 
 .btn-secondary {
@@ -655,6 +663,117 @@ a:hover {
   flex-wrap: wrap;
 }
 
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid rgba(255, 107, 53, 0.15);
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.page-header-center {
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page-header-center h1 {
+  width: 100%;
+}
+
+.page-header-center .btn {
+  margin-top: var(--spacing-sm);
+}
+
+.order-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-top: var(--spacing-md);
+}
+
+.order-card {
+  background: var(--color-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--border-radius) + 4px);
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.order-card h3 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-sm);
+}
+
+.order-card p {
+  margin-bottom: 0.7rem;
+}
+
+.form-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 107, 53, 0.22);
+  border-radius: calc(var(--border-radius) + 4px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+}
+
+.order-form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+#order-items {
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+#order-items th,
+#order-items td {
+  text-align: center;
+}
+
+#order-items td {
+  padding: 1rem 0.75rem;
+}
+
+#order-items td[data-label="Količina"],
+#order-items td[data-label="Napomena"] {
+  text-align: left;
+}
+
+#add-item {
+  display: inline-flex;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .page-header-center {
+    justify-content: center;
+  }
+
+  .form-actions {
+    justify-content: center;
+  }
+}
+
 /* ============================= */
 /* FORMS                         */
 /* ============================= */
@@ -704,6 +823,147 @@ select:focus {
 textarea {
   resize: vertical;
   min-height: 120px;
+}
+
+#order-items {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.9rem;
+}
+
+#order-items th {
+  text-align: left;
+  color: var(--color-text);
+  font-size: 1rem;
+  padding: 1rem 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+#order-items td {
+  padding: 0.75rem 0.5rem;
+  border: none;
+  vertical-align: top;
+}
+
+#order-items tbody tr {
+  background: var(--color-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+}
+
+#order-items tbody tr td {
+  background: transparent;
+}
+
+#order-items .form-control {
+  background-color: var(--color-primary);
+  border-color: var(--color-border);
+}
+
+#order-items .item-menu .select2-selection {
+  background: var(--color-primary);
+  border-color: var(--color-border);
+  color: var(--color-text);
+  min-height: 46px;
+}
+
+#order-items .select2-container--default .select2-selection__rendered {
+  color: var(--color-text);
+}
+
+#order-items .select2-container--default .select2-results__option {
+  color: var(--color-text);
+}
+
+#order-items .select2-container--default .select2-results__option--highlighted {
+  background-color: rgba(255, 107, 53, 0.18);
+  color: var(--color-text);
+}
+
+#order-items .select2-dropdown,
+.select2-dropdown,
+.select2-container--default .select2-results__option {
+  background: var(--color-secondary);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.select2-dropdown.item-menu-dropdown .select2-search__field::placeholder {
+  color: transparent;
+}
+
+.select2-container {
+  width: 100% !important;
+}
+
+.select2-container--default .select2-selection--single {
+  background: var(--color-primary);
+  border: 1px solid var(--color-border);
+  min-height: 46px;
+  color: var(--color-text);
+}
+
+.select2-container--default .select2-selection__rendered,
+.select2-container--default .select2-selection__placeholder,
+.select2-container--default .select2-selection__arrow {
+  color: var(--color-text);
+}
+
+.select2-container--open .select2-dropdown {
+  z-index: 9999;
+}
+
+#order-items .remove-item {
+  min-width: 80px;
+}
+
+#order-items td:nth-child(1) {
+  width: 46%;
+}
+
+#order-items td:nth-child(2) {
+  width: 12%;
+}
+
+#order-items td:nth-child(3) {
+  width: 34%;
+}
+
+#order-items td:nth-child(4) {
+  width: 8%;
+}
+
+@media (max-width: 768px) {
+  #order-items, #order-items thead, #order-items tbody, #order-items th, #order-items td, #order-items tr {
+    display: block;
+    width: 100%;
+  }
+
+  #order-items thead {
+    display: none;
+  }
+
+  #order-items tbody tr {
+    padding: var(--spacing-sm);
+  }
+
+  #order-items td {
+    padding: var(--spacing-sm) 0;
+  }
+
+  #order-items td::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    color: var(--color-text-light);
+  }
+
+  #order-items td:last-child {
+    padding-top: var(--spacing-md);
+  }
 }
 
 /* ============================= */

@@ -1,4 +1,4 @@
-@model FoodOrderingLab2.Models.Order
+@model FoodOrderingLab2.ViewModels.OrderCreateViewModel
 
 @{
     ViewData["Title"] = "Kreiraj narudžbu";
@@ -16,6 +16,7 @@
             <label for="customer-autocomplete">Kupac</label>
             @{
                 ViewData["name"] = "CustomerId";
+                ViewData["id"] = "customer-autocomplete";
                 ViewData["apiUrl"] = "/kupci/search";
             }
             <partial name="_AutocompletePartial" />
@@ -26,6 +27,7 @@
             <label for="restaurant-autocomplete">Restoran</label>
             @{
                 ViewData["name"] = "RestaurantId";
+                ViewData["id"] = "restaurant-autocomplete";
                 ViewData["apiUrl"] = "/restorani/search";
             }
             <partial name="_AutocompletePartial" />
@@ -42,22 +44,27 @@
             <span asp-validation-for="OrderDate" class="text-danger"></span>
         </div>
 
-        <div class="form-group">
-            <label for="status">Status</label>
-            <select name="Status" id="status" class="form-control">
-                <option value="1">Na čekanju</option>
-                <option value="2">Potvrđeno</option>
-                <option value="3">U pripremi</option>
-                <option value="4">Spremno za preuzimanje</option>
-                <option value="5">Dostavljeno</option>
-                <option value="6">Otkazano</option>
-            </select>
-            <span asp-validation-for="Status" class="text-danger"></span>
-        </div>
+        <h3>Stavke narudžbe</h3>
+        <table id="order-items" class="table">
+            <thead>
+                <tr><th>Artikl</th><th>Količina</th><th>Napomena</th><th></th></tr>
+            </thead>
+            <tbody>
+                <tr class="order-item-row" style="display:none;">
+                    <td data-label="Artikl">
+                        <select class="form-control autocomplete-select item-menu" data-api="/meni/search" data-placeholder="Odaberi artikl" name="Items[__index__].MenuItemId" style="width:100%"></select>
+                    </td>
+                    <td data-label="Količina"><input type="number" min="1" value="1" class="form-control" name="Items[__index__].Quantity" /></td>
+                    <td data-label="Napomena"><input type="text" class="form-control" name="Items[__index__].SpecialRequests" /></td>
+                    <td data-label="Akcija"><button type="button" class="btn btn-danger btn-small remove-item">Ukloni</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="margin-bottom: 1rem;"><button type="button" id="add-item" class="btn btn-secondary">Dodaj stavku</button></div>
 
         <div class="form-actions">
-            <button type="submit" class="btn-primary">Spremi narudžbu</button>
-            <a href="@Url.Action("Index")" class="btn-secondary">Odjava</a>
+            <button type="submit" class="btn btn-primary">Spremi narudžbu</button>
+            <a href="@Url.Action("Index")" class="btn btn-secondary">Odustani</a>
         </div>
     </form>
 </div>
@@ -65,4 +72,58 @@
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        (function($){
+            $(function(){
+                var idx = 0;
+                function addRow(){
+                    var $template = $('.order-item-row').clone().removeClass('order-item-row').show();
+                    var html = $template.html().replace(/__index__/g, idx);
+                    var $tr = $('<tr></tr>').html(html);
+                    $('#order-items tbody').append($tr);
+                    // initialize select2 on new select
+                    $tr.find('.autocomplete-select').each(function(){
+                        var $s = $(this);
+                        $s.select2({ ajax: { url: $s.data('api'), dataType: 'json', delay:250, data: function(p){return { q: p.term || '' }; }, processResults: function(d){ return { results: d }; } }, dropdownParent: $('body'), minimumInputLength:0, width:'100%', placeholder:'Type to search...', allowClear:true });
+                    });
+                    idx++;
+                }
+
+                $('#add-item').on('click', function(){ addRow(); });
+                $(document).on('click', '.remove-item', function(){ $(this).closest('tr').remove(); });
+
+                if ($('#order-items tbody tr').not('.order-item-row').length === 0) {
+                    addRow();
+                }
+
+                // form validation on submit
+                $('.order-form').on('submit', function(e){
+                    var valid = true;
+                    var $rows = $('#order-items tbody tr').not('.order-item-row');
+                    if ($rows.length === 0) {
+                        alert('Dodaj barem jednu stavku u narudžbu.');
+                        valid = false;
+                    }
+                    $rows.each(function(){
+                        var menu = $(this).find('select[name$=".MenuItemId"]').val();
+                        var qty = parseInt($(this).find('input[name$=".Quantity"]').val() || '0');
+                        if (!menu || menu === '' || qty <= 0) {
+                            valid = false;
+                            return false;
+                        }
+                    });
+
+                    if (!valid) {
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    // disable submit and show spinner
+                    var $btn = $(this).find('button[type=submit]');
+                    $btn.prop('disabled', true).data('orig', $btn.text()).text('Spremanje...');
+                    return true;
+                });
+            });
+        })(jQuery);
+    </script>
 }

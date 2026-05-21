@@ -144,3 +144,4 @@ D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab2\bin\Debug\net8.0
 D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab2\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab2\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab2\obj\Debug\net8.0\FoodOrde.207ADDB8.Up2Date
+D:\DESKTOPD\repozagit\movie-recommendation-app\FoodOrderingLab2\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

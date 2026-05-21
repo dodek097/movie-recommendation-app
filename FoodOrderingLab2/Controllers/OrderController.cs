@@ -10,14 +10,16 @@ namespace FoodOrderingLab2.Controllers
     public class OrderController : Controller
     {
         private readonly OrderRepository _orderRepository;
-        private readonly RestaurantRepository _restaurantRepository;
+        private readonly RestaurantRepository _restaurant_repository;
         private readonly CustomerRepository _customerRepository;
+        private readonly MenuItemRepository _menuItemRepository;
 
-        public OrderController(OrderRepository orderRepository, RestaurantRepository restaurantRepository, CustomerRepository customerRepository)
+        public OrderController(OrderRepository orderRepository, RestaurantRepository restaurantRepository, CustomerRepository customerRepository, MenuItemRepository menuItemRepository)
         {
             _orderRepository = orderRepository;
-            _restaurantRepository = restaurantRepository;
+            _restaurant_repository = restaurantRepository;
             _customerRepository = customerRepository;
+            _menuItemRepository = menuItemRepository;
         }
 
         [Route("")]
@@ -37,7 +39,7 @@ namespace FoodOrderingLab2.Controllers
             }
 
             var customer = _customerRepository.GetById(order.CustomerId);
-            var restaurant = _restaurantRepository.GetById(order.RestaurantId);
+            var restaurant = _restaurant_repository.GetById(order.RestaurantId);
 
             var viewModel = new OrderDetailViewModel
             {
@@ -54,22 +56,71 @@ namespace FoodOrderingLab2.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            var vm = new OrderCreateViewModel
+            {
+                OrderDate = DateTime.Now
+            };
+            // prepare menu item name lookup for selected items
+            var menuNames = new Dictionary<int, string>();
+            foreach (var it in vm.Items)
+            {
+                var mi = _menuItemRepository.GetById(it.MenuItemId);
+                if (mi != null) menuNames[it.MenuItemId] = mi.Name;
+            }
+            ViewBag.MenuItemNames = menuNames;
+
+            return View(vm);
         }
 
         [Route("create")]
         [HttpPost]
-        public IActionResult Create(Order order)
+        public IActionResult Create(OrderCreateViewModel vm)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                order.Status = Models.Enums.OrderStatus.Pending;
-                order.TotalPrice = 0;
-                _orderRepository.Add(order);
-                return RedirectToAction(nameof(Details), new { id = order.OrderId });
+                return View(vm);
             }
 
-            return View(order);
+            var order = new Order
+            {
+                CustomerId = vm.CustomerId,
+                RestaurantId = vm.RestaurantId,
+                OrderDate = vm.OrderDate,
+                Status = vm.Status,
+                OrderItems = new List<OrderItem>()
+            };
+
+            decimal total = 0m;
+            foreach (var it in vm.Items)
+            {
+                if (it.MenuItemId <= 0 || it.Quantity <= 0) continue;
+                // We will use MenuItemRepository via RestaurantRepository.GetById? Instead, resolve via data context using MenuItemRepository.
+                // To avoid adding new dependency here, fetch via _restaurantRepository.GetById for restaurant then find item.
+                    var menuItemObj = _menuItemRepository.GetById(it.MenuItemId);
+                if (menuItemObj == null)
+                {
+                    // try via MenuItemRepository if possible
+                    // fallback: skip
+                    continue;
+                }
+
+                var orderItem = new OrderItem
+                {
+                    MenuItemId = menuItemObj.MenuItemId,
+                    Quantity = it.Quantity,
+                    UnitPrice = menuItemObj.Price,
+                    SpecialRequests = it.SpecialRequests
+                };
+
+                total += orderItem.UnitPrice * orderItem.Quantity;
+                order.OrderItems.Add(orderItem);
+            }
+
+            order.TotalPrice = total;
+
+            _orderRepository.Add(order);
+            TempData["SuccessMessage"] = "Narudžba je spremljena.";
+            return RedirectToAction(nameof(Details), new { id = order.OrderId });
         }
 
         [Route("edit/{id:int}")]
@@ -82,18 +133,33 @@ namespace FoodOrderingLab2.Controllers
                 return NotFound();
             }
 
-            var customer = _customerRepository.GetById(order.CustomerId);
-            var restaurant = _restaurantRepository.GetById(order.RestaurantId);
+            var vm = new OrderCreateViewModel
+            {
+                CustomerId = order.CustomerId,
+                RestaurantId = order.RestaurantId,
+                OrderDate = order.OrderDate,
+                Status = order.Status,
+                Items = order.OrderItems.Select(oi => new OrderItemCreateModel
+                {
+                    MenuItemId = oi.MenuItemId,
+                    Quantity = oi.Quantity,
+                    SpecialRequests = oi.SpecialRequests
+                }).ToList()
+            };
 
+            var customer = _customerRepository.GetById(order.CustomerId);
+            var restaurant = _restaurant_repository.GetById(order.RestaurantId);
             ViewBag.Customer = customer;
             ViewBag.Restaurant = restaurant;
 
-            return View(order);
+            ViewBag.OrderId = order.OrderId;
+
+            return View(vm);
         }
 
         [Route("edit/{id:int}")]
         [HttpPost]
-        public IActionResult Edit(int id, Order order)
+        public IActionResult Edit(int id, OrderCreateViewModel vm)
         {
             var existing = _orderRepository.GetById(id);
             if (existing == null)
@@ -101,17 +167,44 @@ namespace FoodOrderingLab2.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                existing.CustomerId = order.CustomerId;
-                existing.RestaurantId = order.RestaurantId;
-                existing.OrderDate = order.OrderDate;
-                existing.Status = order.Status;
-                _orderRepository.Update(existing);
-                return RedirectToAction(nameof(Details), new { id = id });
+                ViewBag.Customer = _customerRepository.GetById(vm.CustomerId);
+                ViewBag.Restaurant = _restaurant_repository.GetById(vm.RestaurantId);
+                ViewBag.OrderId = id;
+                return View(vm);
             }
 
-            return View(order);
+            existing.CustomerId = vm.CustomerId;
+            existing.RestaurantId = vm.RestaurantId;
+            existing.OrderDate = vm.OrderDate;
+            existing.Status = vm.Status;
+
+            // Rebuild items
+            existing.OrderItems.Clear();
+            decimal total = 0m;
+            foreach (var it in vm.Items)
+            {
+                if (it.MenuItemId <= 0 || it.Quantity <= 0) continue;
+                var menuItemObj = _menuItemRepository.GetById(it.MenuItemId);
+                if (menuItemObj == null) continue;
+
+                var orderItem = new OrderItem
+                {
+                    MenuItemId = menuItemObj.MenuItemId,
+                    Quantity = it.Quantity,
+                    UnitPrice = menuItemObj.Price,
+                    SpecialRequests = it.SpecialRequests
+                };
+                existing.OrderItems.Add(orderItem);
+                total += orderItem.UnitPrice * orderItem.Quantity;
+            }
+
+            existing.TotalPrice = total;
+
+            _orderRepository.Update(existing);
+            TempData["SuccessMessage"] = "Narudžba je spremljena.";
+            return RedirectToAction(nameof(Details), new { id = id });
         }
 
         [Route("delete/{id:int}")]

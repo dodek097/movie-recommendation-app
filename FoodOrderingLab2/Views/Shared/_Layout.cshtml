@@ -116,6 +116,22 @@
     <script src="~/js/autocomplete.js" asp-append-version="true"></script>
     <script src="~/js/datetime.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <div id="global-toast" style="display:none;position:fixed;right:1rem;bottom:1rem;background:#222;color:#fff;padding:0.75rem 1rem;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.4);z-index:1200;"></div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <script>
+            (function(){
+                var msg = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["SuccessMessage"].ToString()));
+                document.getElementById('global-toast').textContent = msg;
+                var el = document.getElementById('global-toast');
+                el.style.display = 'block';
+                setTimeout(function(){ el.style.opacity = '1'; }, 50);
+                setTimeout(function(){ el.style.transition = 'opacity 300ms'; el.style.opacity = '0'; setTimeout(function(){ el.style.display = 'none'; }, 400); }, 3000);
+            })();
+        </script>
+    }
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
