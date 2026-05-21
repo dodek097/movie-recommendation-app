@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FoodOrderingLab2.Repositories;
 using FoodOrderingLab2.ViewModels;
+using System.Linq;
 
 namespace FoodOrderingLab2.Controllers
 {
@@ -52,6 +53,27 @@ namespace FoodOrderingLab2.Controllers
             };
 
             return View(viewModel);
+        }
+
+        [HttpGet]
+        [Route("search")]
+        public IActionResult Search(string q, int? restaurantId)
+        {
+            q = q ?? string.Empty;
+            var items = _menuItemRepository.GetAll().AsEnumerable();
+            if (restaurantId.HasValue && restaurantId.Value > 0)
+            {
+                items = items.Where(m => m.RestaurantId == restaurantId.Value);
+            }
+
+            var results = items
+                .Where(m => m.Name.Contains(q, System.StringComparison.InvariantCultureIgnoreCase)
+                            || m.Description.Contains(q, System.StringComparison.InvariantCultureIgnoreCase))
+                .Select(m => new { id = m.MenuItemId, text = m.Name })
+                .Take(10)
+                .ToList();
+
+            return Json(results);
         }
     }
 }

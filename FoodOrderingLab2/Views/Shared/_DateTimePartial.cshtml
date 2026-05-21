@@ -1,0 +1,6 @@
+@{
+    var name = ViewData["name"] as string ?? "Date";
+    var value = ViewData["value"] as string ?? "";
+}
+
+<input type="text" class="form-control datetime-picker" name="@name" value="@value" />

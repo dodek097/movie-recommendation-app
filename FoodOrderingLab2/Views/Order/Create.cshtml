@@ -1,0 +1,68 @@
+@model FoodOrderingLab2.Models.Order
+
+@{
+    ViewData["Title"] = "Kreiraj narudžbu";
+}
+
+<div class="page-header">
+    <h1>Kreiraj narudžbu</h1>
+</div>
+
+<div class="form-container">
+    <form method="post" class="order-form">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="form-group">
+            <label for="customer-autocomplete">Kupac</label>
+            @{
+                ViewData["name"] = "CustomerId";
+                ViewData["apiUrl"] = "/kupci/search";
+            }
+            <partial name="_AutocompletePartial" />
+            <span asp-validation-for="CustomerId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="restaurant-autocomplete">Restoran</label>
+            @{
+                ViewData["name"] = "RestaurantId";
+                ViewData["apiUrl"] = "/restorani/search";
+            }
+            <partial name="_AutocompletePartial" />
+            <span asp-validation-for="RestaurantId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="order-date">Datum narudžbe</label>
+            @{
+                ViewData["name"] = "OrderDate";
+                ViewData["value"] = Model?.OrderDate.ToString("d.M.yyyy H:mm") ?? DateTime.Now.ToString("d.M.yyyy H:mm");
+            }
+            <partial name="_DateTimePartial" />
+            <span asp-validation-for="OrderDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select name="Status" id="status" class="form-control">
+                <option value="1">Na čekanju</option>
+                <option value="2">Potvrđeno</option>
+                <option value="3">U pripremi</option>
+                <option value="4">Spremno za preuzimanje</option>
+                <option value="5">Dostavljeno</option>
+                <option value="6">Otkazano</option>
+            </select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Spremi narudžbu</button>
+            <a href="@Url.Action("Index")" class="btn-secondary">Odjava</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

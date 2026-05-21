@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using FoodOrderingLab2.Repositories;
+using System.Linq;
 
 namespace FoodOrderingLab2.Controllers
 {
@@ -30,6 +31,21 @@ namespace FoodOrderingLab2.Controllers
             }
 
             return View(customer);
+        }
+
+        [HttpGet]
+        [Route("search")]
+        public IActionResult Search(string q)
+        {
+            q = q ?? string.Empty;
+            var results = _customerRepository.GetAll()
+                .Where(c => c.FullName.Contains(q, System.StringComparison.InvariantCultureIgnoreCase)
+                            || c.Email.Contains(q, System.StringComparison.InvariantCultureIgnoreCase))
+                .Select(c => new { id = c.CustomerId, text = c.FullName })
+                .Take(10)
+                .ToList();
+
+            return Json(results);
         }
     }
 }

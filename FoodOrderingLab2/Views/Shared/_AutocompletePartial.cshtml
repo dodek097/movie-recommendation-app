@@ -1,0 +1,13 @@
+@{
+    var name = ViewData["name"] as string ?? "autocomplete";
+    var apiUrl = ViewData["apiUrl"] as string ?? "";
+    var selectedId = ViewData["selectedId"]?.ToString() ?? "";
+    var selectedText = ViewData["selectedText"] as string ?? "";
+}
+
+<select class="form-control autocomplete-select" name="@name" data-api="@apiUrl" style="width:100%">
+    @if (!string.IsNullOrEmpty(selectedId))
+    {
+        <option value="@selectedId" selected="selected">@selectedText</option>
+    }
+</select>

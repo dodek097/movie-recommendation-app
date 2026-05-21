@@ -1,13 +1,24 @@
 @model List<FoodOrderingLab2.Models.Order>
 @{ ViewData["Title"] = "Orders"; }
-<h1>All Orders</h1>
+
+<div class="page-header">
+    <h1>Narudžbe</h1>
+    <a asp-controller="Order" asp-action="Create" class="btn-primary">+ Kreiraj narudžbu</a>
+</div>
+
 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
 @foreach (var order in Model) {
     <div style="border: 1px solid #444; padding: 15px;">
-        <h3>Order #@order.OrderId</h3>
-        <p>Status: @order.Status</p>
-        <p>@order.TotalPrice.ToString("F2")</p>
-        <a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId">View</a>
+        <h3>Narudžba #@order.OrderId</h3>
+        <p><strong>Kupac:</strong> @order.Customer?.FullName</p>
+        <p><strong>Restoran:</strong> @order.Restaurant?.Name</p>
+        <p><strong>Status:</strong> @order.Status</p>
+        <p><strong>Cijena:</strong> @order.TotalPrice.ToString("F2") EUR</p>
+        <p><strong>Datum:</strong> @order.OrderDate.ToString("d.M.yyyy H:mm")</p>
+        <div style="margin-top: 10px; display: flex; gap: 8px;">
+            <a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="btn-secondary">Pregled</a>
+            <a asp-controller="Order" asp-action="Edit" asp-route-id="@order.OrderId" class="btn-secondary">Uredi</a>
+        </div>
     </div>
 }
 </div>

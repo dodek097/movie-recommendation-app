@@ -394,3 +394,5 @@ FOOD ORDERING LAB 3 - AGENT LOG
 ===============================================
 [2026-05-07] Starting Lab 3 implementation: EF Core integration, routing, repository migration, semantic docs.
 
+[2026-05-21] Starting Lab 4 implementation: added shared partials (`_AutocompletePartial`, `_DateTimePartial`), included select2/flatpickr via CDN, added `autocomplete.js` and `datetime.js`, and implemented simple AJAX search endpoints for Customer, Restaurant and MenuItem controllers. Working on integrating these into Create/Edit views next.
+

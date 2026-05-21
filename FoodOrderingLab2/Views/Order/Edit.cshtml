@@ -1,0 +1,85 @@
+@model FoodOrderingLab2.Models.Order
+
+@{
+    ViewData["Title"] = "Uredi narudžbu";
+    var customer = ViewBag.Customer as FoodOrderingLab2.Models.Customer;
+    var restaurant = ViewBag.Restaurant as FoodOrderingLab2.Models.Restaurant;
+}
+
+<div class="page-header">
+    <h1>Uredi narudžbu #@Model.OrderId</h1>
+</div>
+
+<div class="form-container">
+    <form method="post" class="order-form">
+        <input type="hidden" name="OrderId" value="@Model.OrderId" />
+        
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="form-group">
+            <label for="customer-autocomplete">Kupac</label>
+            @{
+                ViewData["name"] = "CustomerId";
+                ViewData["apiUrl"] = "/kupci/search";
+                ViewData["selectedId"] = Model.CustomerId.ToString();
+                ViewData["selectedText"] = customer?.FullName ?? "Nepoznat kupac";
+            }
+            <partial name="_AutocompletePartial" />
+            <span asp-validation-for="CustomerId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="restaurant-autocomplete">Restoran</label>
+            @{
+                ViewData["name"] = "RestaurantId";
+                ViewData["apiUrl"] = "/restorani/search";
+                ViewData["selectedId"] = Model.RestaurantId.ToString();
+                ViewData["selectedText"] = restaurant?.Name ?? "Nepoznat restoran";
+            }
+            <partial name="_AutocompletePartial" />
+            <span asp-validation-for="RestaurantId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="order-date">Datum narudžbe</label>
+            @{
+                ViewData["name"] = "OrderDate";
+                ViewData["value"] = Model.OrderDate.ToString("d.M.yyyy H:mm");
+            }
+            <partial name="_DateTimePartial" />
+            <span asp-validation-for="OrderDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select name="Status" id="status" class="form-control">
+@{
+    var statusVal = (int)Model.Status;
+    if (statusVal == 1) { <text><option value="1" selected>Na čekanju</option></text> } else { <text><option value="1">Na čekanju</option></text> }
+    if (statusVal == 2) { <text><option value="2" selected>Potvrđeno</option></text> } else { <text><option value="2">Potvrđeno</option></text> }
+    if (statusVal == 3) { <text><option value="3" selected>U pripremi</option></text> } else { <text><option value="3">U pripremi</option></text> }
+    if (statusVal == 4) { <text><option value="4" selected>Spremno za preuzimanje</option></text> } else { <text><option value="4">Spremno za preuzimanje</option></text> }
+    if (statusVal == 5) { <text><option value="5" selected>Dostavljeno</option></text> } else { <text><option value="5">Dostavljeno</option></text> }
+    if (statusVal == 6) { <text><option value="6" selected>Otkazano</option></text> } else { <text><option value="6">Otkazano</option></text> }
+}
+            </select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Spremi promjene</button>
+            <a href="@Url.Action("Details", new { id = Model.OrderId })" class="btn-secondary">Odjava</a>
+        </div>
+    </form>
+
+    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #444;">
+        <form method="post" action="@Url.Action("Delete", new { id = Model.OrderId })" style="display:inline;">
+            <button type="submit" class="btn-danger" onclick="return confirm('Jeste sigurni da želite obrisati ovu narudžbu?');">Obriši narudžbu</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}
