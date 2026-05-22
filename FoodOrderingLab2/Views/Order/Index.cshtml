@@ -3,10 +3,15 @@
 
 <div class="page-header page-header-center">
     <h1>Narudžbe</h1>
-    <a asp-controller="Order" asp-action="Create" class="btn btn-primary btn-large">+ Kreiraj narudžbu</a>
+    <div class="header-actions">
+        <a asp-controller="Order" asp-action="Create" class="btn btn-primary btn-large">+ Kreiraj narudžbu</a>
+    </div>
+    <div class="search-row">
+        <input type="search" class="search-input" placeholder="Search orders..." data-search-api="/narudzbe/search" data-search-template="order" data-search-target="#order-results" autocomplete="off" />
+    </div>
 </div>
 
-<div class="order-grid">
+<div class="order-grid search-grid" id="order-results">
 @foreach (var order in Model) {
     <div class="order-card">
         <h3>Narudžba #@order.OrderId</h3>

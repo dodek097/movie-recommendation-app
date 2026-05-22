@@ -32,8 +32,18 @@
             </div>
         </div>
 
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+        }
+
         <div class="detail-action">
             <a class="btn btn-secondary" asp-controller="Restaurant" asp-action="Index">Back to restaurants</a>
+            <a class="btn btn-outline" asp-controller="Restaurant" asp-action="Edit" asp-route-id="@Model.Restaurant.RestaurantId">Edit</a>
+            <form asp-controller="Restaurant" asp-action="Delete" asp-route-id="@Model.Restaurant.RestaurantId" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Jeste li sigurni da želite obrisati ovaj restoran?');">Delete</button>
+            </form>
         </div>
     </div>
 </section>

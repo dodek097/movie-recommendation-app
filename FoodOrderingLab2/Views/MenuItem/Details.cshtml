@@ -26,6 +26,11 @@
 
         <div class="detail-action">
             <a class="btn btn-secondary" asp-controller="MenuItem" asp-action="Index">Back to menu</a>
+            <a class="btn btn-secondary" asp-controller="MenuItem" asp-action="Edit" asp-route-id="@Model.MenuItem.MenuItemId">Edit</a>
+            <form asp-controller="MenuItem" asp-action="Delete" asp-route-id="@Model.MenuItem.MenuItemId" method="post" class="d-inline-block" onsubmit="return confirm('Jeste li sigurni da želite obrisati stavku menija?');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
         </div>
     </div>
 </section>

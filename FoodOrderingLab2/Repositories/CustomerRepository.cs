@@ -27,5 +27,28 @@ namespace FoodOrderingLab2.Repositories
                 .Include(c => c.Orders)
                 .FirstOrDefault(c => c.CustomerId == id);
         }
+
+        public int GetNextId()
+        {
+            return _context.Customers.Any() ? _context.Customers.Max(c => c.CustomerId) + 1 : 1;
+        }
+
+        public void Add(Customer customer)
+        {
+            _context.Customers.Add(customer);
+            _context.SaveChanges();
+        }
+
+        public void Update(Customer customer)
+        {
+            _context.Customers.Update(customer);
+            _context.SaveChanges();
+        }
+
+        public void Delete(Customer customer)
+        {
+            _context.Customers.Remove(customer);
+            _context.SaveChanges();
+        }
     }
 }

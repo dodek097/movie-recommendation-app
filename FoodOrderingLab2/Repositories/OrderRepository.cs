@@ -60,13 +60,19 @@ namespace FoodOrderingLab2.Repositories
 
         public List<Order> Search(string q)
         {
-            q = q?.ToLower() ?? string.Empty;
+            q = q?.Trim().ToLower() ?? string.Empty;
+            var digits = new string(q.Where(char.IsDigit).ToArray());
+            int.TryParse(digits, out var numericId);
+
             return _context.Orders
-                .Where(o => o.Customer.FirstName.ToLower().Contains(q)
-                         || o.Customer.LastName.ToLower().Contains(q)
-                         || o.Status.ToString().ToLower().Contains(q))
                 .Include(o => o.Customer)
                 .Include(o => o.Restaurant)
+                .Where(o => (o.Customer.FirstName.ToLower().Contains(q)
+                         || o.Customer.LastName.ToLower().Contains(q)
+                         || o.Restaurant.Name.ToLower().Contains(q)
+                         || o.Status.ToString().ToLower().Contains(q)
+                         || o.OrderId.ToString().Contains(q))
+                         || (numericId > 0 && o.OrderId == numericId))
                 .AsNoTracking()
                 .ToList();
         }

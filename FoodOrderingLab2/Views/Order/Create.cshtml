@@ -4,7 +4,7 @@
     ViewData["Title"] = "Kreiraj narudžbu";
 }
 
-<div class="page-header">
+<div class="page-header page-header-center">
     <h1>Kreiraj narudžbu</h1>
 </div>
 
@@ -76,23 +76,120 @@
         (function($){
             $(function(){
                 var idx = 0;
+
+                function getSelectedRestaurantId(){
+                    return $('#restaurant-autocomplete').val();
+                }
+
+                function initMenuItemSelect($s){
+                    var placeholder = $s.data('placeholder') || 'Odaberi artikl';
+                    $s.select2({
+                        ajax: {
+                            url: $s.data('api'),
+                            dataType: 'json',
+                            delay: 250,
+                            data: function(params){
+                                return {
+                                    q: params.term || '',
+                                    restaurantId: getSelectedRestaurantId()
+                                };
+                            },
+                            processResults: function(d){ return { results: d }; }
+                        },
+                        dropdownParent: $('body'),
+                        minimumInputLength: 0,
+                        width: '100%',
+                        placeholder: placeholder,
+                        allowClear: true
+                    });
+                }
+
+                function updateItemControls(){
+                    var hasRestaurant = !!getSelectedRestaurantId();
+                    $('#add-item').prop('disabled', !hasRestaurant);
+                }
+
+                function markFieldValidity($field, isValid){
+                    $field.toggleClass('input-error', !isValid);
+                    var $error = $field.next('.field-error');
+                    if (!isValid) {
+                        if (!$error.length) {
+                            $field.after('<span class="field-error">Obavezno polje ili količina mora biti veća od 0.</span>');
+                        }
+                    } else {
+                        $error.remove();
+                    }
+                }
+
+                function validateOrderRow($row){
+                    var $menu = $row.find('select[name$=".MenuItemId"]');
+                    var $qty = $row.find('input[name$=".Quantity"]');
+                    var menuValid = !!$menu.val();
+                    var qtyVal = parseInt($qty.val() || '0', 10);
+                    var qtyValid = qtyVal > 0;
+                    markFieldValidity($menu, menuValid);
+                    markFieldValidity($qty, qtyValid);
+                    return menuValid && qtyValid;
+                }
+
+                function bindRowValidation($row){
+                    $row.find('select[name$=".MenuItemId"]').on('change', function(){
+                        validateOrderRow($row);
+                    });
+                    $row.find('input[name$=".Quantity"]').on('blur', function(){
+                        validateOrderRow($row);
+                    });
+                }
+
+                function animateRowIn($row){
+                    $row.addClass('new-row');
+                    requestAnimationFrame(function(){
+                        $row.addClass('animate-in');
+                    });
+                }
+
+                function animateRowOut($row){
+                    $row.addClass('removing');
+                    window.setTimeout(function(){
+                        $row.remove();
+                    }, 240);
+                }
+
                 function addRow(){
+                    var restaurantId = getSelectedRestaurantId();
+                    if (!restaurantId) {
+                        return;
+                    }
                     var $template = $('.order-item-row').clone().removeClass('order-item-row').show();
                     var html = $template.html().replace(/__index__/g, idx);
-                    var $tr = $('<tr></tr>').html(html);
+                    var $tr = $('<tr></tr>').html(html).addClass('new-row');
                     $('#order-items tbody').append($tr);
-                    // initialize select2 on new select
                     $tr.find('.autocomplete-select').each(function(){
-                        var $s = $(this);
-                        $s.select2({ ajax: { url: $s.data('api'), dataType: 'json', delay:250, data: function(p){return { q: p.term || '' }; }, processResults: function(d){ return { results: d }; } }, dropdownParent: $('body'), minimumInputLength:0, width:'100%', placeholder:'Type to search...', allowClear:true });
+                        initMenuItemSelect($(this));
+                    });
+                    bindRowValidation($tr);
+                    requestAnimationFrame(function(){
+                        $tr.addClass('animate-in');
                     });
                     idx++;
                 }
 
-                $('#add-item').on('click', function(){ addRow(); });
-                $(document).on('click', '.remove-item', function(){ $(this).closest('tr').remove(); });
+                $('#restaurant-autocomplete').on('change', function(){
+                    $('#order-items tbody tr').not('.order-item-row').remove();
+                    updateItemControls();
+                    if (getSelectedRestaurantId()) {
+                        addRow();
+                    }
+                });
 
-                if ($('#order-items tbody tr').not('.order-item-row').length === 0) {
+                $('#add-item').on('click', function(){ addRow(); });
+                $(document).on('click', '.remove-item', function(){
+                    var $row = $(this).closest('tr');
+                    animateRowOut($row);
+                });
+
+                updateItemControls();
+                if (getSelectedRestaurantId() && $('#order-items tbody tr').not('.order-item-row').length === 0) {
                     addRow();
                 }
 
@@ -108,7 +205,7 @@
                         var menu = $(this).find('select[name$=".MenuItemId"]').val();
                         var qty = parseInt($(this).find('input[name$=".Quantity"]').val() || '0');
                         if (!menu || menu === '' || qty <= 0) {
-                            valid = false;
+                        validateOrderRow($(this));
                             return false;
                         }
                     });

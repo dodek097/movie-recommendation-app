@@ -25,6 +25,7 @@ namespace FoodOrderingLab2.Repositories
         {
             return _context.MenuItems
                 .Include(m => m.Restaurant)
+                .Include(m => m.OrderItems)
                 .FirstOrDefault(m => m.MenuItemId == id);
         }
 
@@ -35,6 +36,41 @@ namespace FoodOrderingLab2.Repositories
                 .Include(m => m.Restaurant)
                 .AsNoTracking()
                 .ToList();
+        }
+
+        public int GetNextId()
+        {
+            return _context.MenuItems.Any() ? _context.MenuItems.Max(m => m.MenuItemId) + 1 : 1;
+        }
+
+        public void AddRange(IEnumerable<MenuItem> items)
+        {
+            _context.MenuItems.AddRange(items);
+            _context.SaveChanges();
+        }
+
+        public MenuItem Add(MenuItem item)
+        {
+            if (item.MenuItemId == 0)
+            {
+                item.MenuItemId = GetNextId();
+            }
+
+            _context.MenuItems.Add(item);
+            _context.SaveChanges();
+            return item;
+        }
+
+        public void Update(MenuItem item)
+        {
+            _context.MenuItems.Update(item);
+            _context.SaveChanges();
+        }
+
+        public void Delete(MenuItem item)
+        {
+            _context.MenuItems.Remove(item);
+            _context.SaveChanges();
         }
     }
 }

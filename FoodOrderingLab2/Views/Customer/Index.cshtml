@@ -1,13 +1,32 @@
 @model List<FoodOrderingLab2.Models.Customer>
 @{ ViewData["Title"] = "Customers"; }
-<h1>All Customers</h1>
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+<div class="page-header">
+    <h1>All Customers</h1>
+    <div class="page-header-center">
+        <a asp-controller="Customer" asp-action="Create" class="btn btn-primary btn-large">+ Novi kupac</a>
+        <div class="search-row">
+            <input type="search" class="search-input" placeholder="Search customers..." data-search-api="/kupci/search" data-search-template="customer" data-search-target="#customer-results" autocomplete="off" />
+        </div>
+    </div>
+</div>
+<div class="search-grid" id="customer-results">
 @foreach (var customer in Model) {
-    <div style="border: 1px solid #444; padding: 12px;">
-        <h3>@customer.FullName</h3>
-        <p>@customer.Email</p>
-        <p>@customer.Phone</p>
-        <a asp-controller="Customer" asp-action="Details" asp-route-id="@customer.CustomerId">View</a>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">@customer.FullName</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-description"><strong>Email:</strong> @customer.Email</p>
+            <p class="card-description"><strong>Phone:</strong> @customer.Phone</p>
+        </div>
+        <div class="card-footer">
+            <a asp-controller="Customer" asp-action="Details" asp-route-id="@customer.CustomerId" class="btn btn-secondary">View</a>
+            <a asp-controller="Customer" asp-action="Edit" asp-route-id="@customer.CustomerId" class="btn btn-outline">Edit</a>
+            <form asp-controller="Customer" asp-action="Delete" asp-route-id="@customer.CustomerId" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Jeste li sigurni da želite obrisati ovog kupca?');">Delete</button>
+            </form>
+        </div>
     </div>
 }
 </div>

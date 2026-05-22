@@ -1,13 +1,32 @@
 @model List<FoodOrderingLab2.Models.Restaurant>
 @{ ViewData["Title"] = "Restaurants"; }
-<h1>All Restaurants</h1>
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+<div class="page-header">
+    <h1>All Restaurants</h1>
+    <div class="page-header-center">
+        <a asp-controller="Restaurant" asp-action="Create" class="btn btn-primary btn-large">+ Novi restoran</a>
+        <div class="search-row">
+            <input type="search" class="search-input" placeholder="Search restaurants..." data-search-api="/restorani/search" data-search-template="restaurant" data-search-target="#restaurant-results" autocomplete="off" />
+        </div>
+    </div>
+</div>
+<div class="search-grid" id="restaurant-results">
 @foreach (var restaurant in Model) {
-    <div style="border: 1px solid #444; padding: 15px; border-radius: 8px;">
-        <h3>@restaurant.Name</h3>
-        <p>Rating: @restaurant.Rating</p>
-        <p>@restaurant.Address</p>
-        <a asp-controller="Restaurant" asp-action="Details" asp-route-id="@restaurant.RestaurantId">View</a>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">@restaurant.Name</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-description"><strong>Rating:</strong> @restaurant.Rating</p>
+            <p class="card-description">@restaurant.Address</p>
+        </div>
+        <div class="card-footer">
+            <a asp-controller="Restaurant" asp-action="Details" asp-route-id="@restaurant.RestaurantId" class="btn btn-secondary">View</a>
+            <a asp-controller="Restaurant" asp-action="Edit" asp-route-id="@restaurant.RestaurantId" class="btn btn-outline">Edit</a>
+            <form asp-controller="Restaurant" asp-action="Delete" asp-route-id="@restaurant.RestaurantId" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Jeste li sigurni da želite obrisati ovaj restoran?');">Delete</button>
+            </form>
+        </div>
     </div>
 }
 </div>

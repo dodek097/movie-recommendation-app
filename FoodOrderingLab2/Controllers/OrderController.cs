@@ -29,6 +29,27 @@ namespace FoodOrderingLab2.Controllers
             return View(orders);
         }
 
+        [HttpGet]
+        [Route("search")]
+        public IActionResult Search(string q)
+        {
+            q = q ?? string.Empty;
+            var results = _orderRepository.Search(q)
+                .Select(o => new
+                {
+                    id = o.OrderId,
+                    text = $"Narudžba #{o.OrderId}",
+                    customerName = o.Customer?.FullName,
+                    restaurantName = o.Restaurant?.Name,
+                    status = o.Status.ToString(),
+                    totalPrice = o.TotalPrice.ToString("F2"),
+                    orderDateText = o.OrderDate.ToString("d.M.yyyy H:mm")
+                })
+                .ToList();
+
+            return Json(results);
+        }
+
         [Route("{id:int}")]
         public IActionResult Details(int id)
         {
@@ -96,12 +117,11 @@ namespace FoodOrderingLab2.Controllers
                 if (it.MenuItemId <= 0 || it.Quantity <= 0) continue;
                 // We will use MenuItemRepository via RestaurantRepository.GetById? Instead, resolve via data context using MenuItemRepository.
                 // To avoid adding new dependency here, fetch via _restaurantRepository.GetById for restaurant then find item.
-                    var menuItemObj = _menuItemRepository.GetById(it.MenuItemId);
-                if (menuItemObj == null)
+                var menuItemObj = _menuItemRepository.GetById(it.MenuItemId);
+                if (menuItemObj == null || menuItemObj.RestaurantId != vm.RestaurantId)
                 {
-                    // try via MenuItemRepository if possible
-                    // fallback: skip
-                    continue;
+                    ModelState.AddModelError(string.Empty, "Odabrani artikl mora pripadati odabranom restoranu.");
+                    break;
                 }
 
                 var orderItem = new OrderItem
@@ -114,6 +134,18 @@ namespace FoodOrderingLab2.Controllers
 
                 total += orderItem.UnitPrice * orderItem.Quantity;
                 order.OrderItems.Add(orderItem);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var menuNames = new Dictionary<int, string>();
+                foreach (var it in vm.Items)
+                {
+                    var mi = _menuItemRepository.GetById(it.MenuItemId);
+                    if (mi != null) menuNames[it.MenuItemId] = mi.Name;
+                }
+                ViewBag.MenuItemNames = menuNames;
+                return View(vm);
             }
 
             order.TotalPrice = total;
@@ -187,7 +219,11 @@ namespace FoodOrderingLab2.Controllers
             {
                 if (it.MenuItemId <= 0 || it.Quantity <= 0) continue;
                 var menuItemObj = _menuItemRepository.GetById(it.MenuItemId);
-                if (menuItemObj == null) continue;
+                if (menuItemObj == null || menuItemObj.RestaurantId != vm.RestaurantId)
+                {
+                    ModelState.AddModelError(string.Empty, "Odabrani artikl mora pripadati odabranom restoranu.");
+                    break;
+                }
 
                 var orderItem = new OrderItem
                 {
@@ -198,6 +234,14 @@ namespace FoodOrderingLab2.Controllers
                 };
                 existing.OrderItems.Add(orderItem);
                 total += orderItem.UnitPrice * orderItem.Quantity;
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Customer = _customerRepository.GetById(vm.CustomerId);
+                ViewBag.Restaurant = _restaurant_repository.GetById(vm.RestaurantId);
+                ViewBag.OrderId = id;
+                return View(vm);
             }
 
             existing.TotalPrice = total;
