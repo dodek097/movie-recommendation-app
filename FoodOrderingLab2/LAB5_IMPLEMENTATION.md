@@ -82,3 +82,7 @@ Integracijski testovi koriste `WebApplicationFactory`, pravi HTTP sloj, testnu a
 EF Core InMemory bazu. Pokrivaju CRUD, pretragu, validaciju, nepostojeće ID-eve i autorizaciju
 za svih šest API površina. Dodatni test prolazi MVC upload, AJAX popis i brisanje privitka s
 anti-forgery zaštitom.
+
+Identity testovi dodatno potvrđuju lokalnu registraciju i prijavu, proširena `OIB`/`JMBG` polja,
+seed `Admin` i `Manager` rola, anonimni pristup javnim akcijama te zabranu Create/Edit/Delete
+operacija običnom korisniku.

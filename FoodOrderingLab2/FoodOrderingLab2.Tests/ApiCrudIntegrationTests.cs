@@ -308,6 +308,10 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         {
             Assert.Equal(HttpStatusCode.OK, (await anonymous.GetAsync(path)).StatusCode);
         }
+        foreach (var path in new[] { "/restorani", "/restorani/search?q=test", "/meni", "/meni/search?q=test" })
+        {
+            Assert.Equal(HttpStatusCode.OK, (await anonymous.GetAsync(path)).StatusCode);
+        }
 
         var protectedDetails = new[]
         {
@@ -321,6 +325,30 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         foreach (var path in protectedDetails)
         {
             Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync(path)).StatusCode);
+        }
+
+        using var customer = factory.CreateCustomerClient();
+        var staffOnlyWrites = new[]
+        {
+            "/api/customers",
+            "/api/restaurants",
+            "/api/menu-items",
+            "/api/orders",
+            $"/api/orders/{seed.OrderId}/items",
+            "/api/restaurant-attachments"
+        };
+        foreach (var path in staffOnlyWrites)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, path)
+            {
+                Content = JsonContent.Create(new { })
+            };
+            Assert.Equal(HttpStatusCode.Forbidden, (await customer.SendAsync(request)).StatusCode);
+        }
+        foreach (var path in protectedDetails)
+        {
+            Assert.Equal(HttpStatusCode.Forbidden, (await customer.PutAsJsonAsync(path, new { })).StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, (await customer.DeleteAsync(path)).StatusCode);
         }
 
         using var manager = factory.CreateManagerClient();
@@ -397,6 +425,80 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         var customer = Assert.Single(db.Customers);
         Assert.Equal(email, customer.Email);
         Assert.NotNull(customer.AppUserId);
+
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        var user = await userManager.FindByEmailAsync(email);
+        Assert.NotNull(user);
+        Assert.Equal("12345678901", user.OIB);
+        Assert.Equal("1234567890123", user.JMBG);
+        Assert.True(await userManager.CheckPasswordAsync(user, "Customer123!"));
+    }
+
+    [Fact]
+    public async Task LocalLogin_AcceptsValidCredentialsAndRejectsInvalidCredentials()
+    {
+        await factory.ResetAsync();
+        const string email = "local-login@example.com";
+        const string password = "Local123!";
+
+        using (var scope = factory.Services.CreateScope())
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+            var result = await userManager.CreateAsync(new AppUser
+            {
+                UserName = email,
+                Email = email,
+                OIB = "12345678901",
+                JMBG = "1234567890123"
+            }, password);
+            Assert.True(result.Succeeded);
+        }
+
+        using var validClient = factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        var loginPage = await validClient.GetStringAsync("/Identity/Account/Login");
+        var validResponse = await validClient.PostAsync("/Identity/Account/Login", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["__RequestVerificationToken"] = ExtractAntiForgeryToken(loginPage),
+            ["Input.Email"] = email,
+            ["Input.Password"] = password,
+            ["Input.RememberMe"] = "true"
+        }));
+        Assert.Equal(HttpStatusCode.Redirect, validResponse.StatusCode);
+
+        using var invalidClient = factory.CreateClient();
+        var invalidLoginPage = await invalidClient.GetStringAsync("/Identity/Account/Login");
+        var invalidResponse = await invalidClient.PostAsync("/Identity/Account/Login", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["__RequestVerificationToken"] = ExtractAntiForgeryToken(invalidLoginPage),
+            ["Input.Email"] = email,
+            ["Input.Password"] = "Wrong123!",
+            ["Input.RememberMe"] = "false"
+        }));
+        Assert.Equal(HttpStatusCode.OK, invalidResponse.StatusCode);
+        Assert.Contains("Neispravan email ili lozinka", await invalidResponse.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task IdentitySeeder_CreatesAdminAndManagerRolesAndAccounts()
+    {
+        await factory.ResetAsync();
+        using var scope = factory.Services.CreateScope();
+        await IdentitySeeder.SeedAsync(scope.ServiceProvider);
+
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        Assert.True(await roleManager.RoleExistsAsync("Admin"));
+        Assert.True(await roleManager.RoleExistsAsync("Manager"));
+
+        var admin = await userManager.FindByEmailAsync(IdentitySeeder.AdminEmail);
+        var manager = await userManager.FindByEmailAsync(IdentitySeeder.ManagerEmail);
+        Assert.NotNull(admin);
+        Assert.NotNull(manager);
+        Assert.True(await userManager.IsInRoleAsync(admin, "Admin"));
+        Assert.True(await userManager.IsInRoleAsync(manager, "Manager"));
     }
 
     [Fact]
