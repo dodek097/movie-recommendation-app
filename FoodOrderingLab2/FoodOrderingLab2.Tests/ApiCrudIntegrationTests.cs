@@ -125,7 +125,8 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         await factory.ResetAsync();
         var seed = await ApiTestData.SeedAsync(factory);
         using var client = factory.CreateAdminClient();
-        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync($"/api/orders/{seed.OrderId}/items")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK,
+            (await client.GetAsync($"/api/orders/{seed.OrderId}/items?q=bez&menuItemId={seed.MenuItemId}")).StatusCode);
         var request = new OrderItemRequest { MenuItemId = seed.SecondMenuItemId, Quantity = 2, SpecialRequests = "Bez umaka" };
         var create = await client.PostAsJsonAsync($"/api/orders/{seed.OrderId}/items", request);
         Assert.Equal(HttpStatusCode.Created, create.StatusCode);

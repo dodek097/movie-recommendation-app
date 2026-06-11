@@ -12,11 +12,19 @@ namespace FoodOrderingLab2.Controllers.Api;
 public class OrderItemsApiController(ApplicationDbContext db) : ControllerBase
 {
     [AllowAnonymous, HttpGet]
-    public async Task<ActionResult<IEnumerable<OrderItemDto>>> GetAll(int orderId)
+    public async Task<ActionResult<IEnumerable<OrderItemDto>>> GetAll(
+        int orderId,
+        [FromQuery] string? q,
+        [FromQuery] int? menuItemId)
     {
         if (!await db.Orders.AnyAsync(x => x.OrderId == orderId)) return NotFound();
-        var values = await db.OrderItems.Include(x => x.MenuItem).AsNoTracking()
-            .Where(x => x.OrderId == orderId).ToListAsync();
+        var query = db.OrderItems.Include(x => x.MenuItem).AsNoTracking()
+            .Where(x => x.OrderId == orderId);
+        if (!string.IsNullOrWhiteSpace(q))
+            query = query.Where(x => x.MenuItem.Name.Contains(q) || (x.SpecialRequests != null && x.SpecialRequests.Contains(q)));
+        if (menuItemId.HasValue) query = query.Where(x => x.MenuItemId == menuItemId);
+
+        var values = await query.OrderBy(x => x.OrderItemId).ToListAsync();
         return Ok(values.Select(x => x.ToDto()));
     }
 
