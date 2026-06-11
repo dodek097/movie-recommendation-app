@@ -213,6 +213,39 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
     }
 
     [Fact]
+    public async Task RestaurantDetails_ShowsPublicAttachmentsAndEmptyState()
+    {
+        await factory.ResetAsync();
+        var seed = await ApiTestData.SeedAsync(factory);
+        using var client = factory.CreateCustomerClient();
+
+        var emptyPage = await client.GetStringAsync($"/restorani/{seed.RestaurantId}");
+        Assert.Contains("No files available yet", emptyPage);
+
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            db.RestaurantAttachments.Add(new RestaurantAttachment
+            {
+                RestaurantId = seed.RestaurantId,
+                FileName = "javni-jelovnik.pdf",
+                FilePath = "/uploads/restaurants/javni-jelovnik.pdf",
+                ContentType = "application/pdf",
+                FileSize = 2048,
+                CreatedAt = DateTime.UtcNow
+            });
+            await db.SaveChangesAsync();
+        }
+
+        var page = await client.GetStringAsync($"/restorani/{seed.RestaurantId}");
+        Assert.Contains("Menus & Documents", page);
+        Assert.Contains("javni-jelovnik.pdf", page);
+        Assert.Contains("Open file", page);
+        Assert.DoesNotContain("No files available yet", page);
+        Assert.DoesNotContain("delete-attachment", page);
+    }
+
+    [Fact]
     public async Task Authorization_ReturnsExpectedStatuses()
     {
         await factory.ResetAsync();

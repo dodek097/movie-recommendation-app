@@ -198,7 +198,12 @@ namespace FoodOrderingLab2.Controllers
             var viewModel = new RestaurantDetailViewModel
             {
                 Restaurant = restaurant,
-                MenuItems = _menuItemRepository.GetByRestaurantId(id)
+                MenuItems = _menuItemRepository.GetByRestaurantId(id),
+                Attachments = _dbContext.RestaurantAttachments
+                    .AsNoTracking()
+                    .Where(x => x.RestaurantId == id)
+                    .OrderByDescending(x => x.CreatedAt)
+                    .ToList()
             };
 
             ViewBag.ErrorMessage = TempData["ErrorMessage"];

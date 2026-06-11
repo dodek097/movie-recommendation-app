@@ -46,6 +46,54 @@
             </div>
         </div>
 
+        <div class="detail-section">
+            <div class="section-heading">
+                <div>
+                    <span class="detail-eyebrow">Restaurant files</span>
+                    <h2>Menus & Documents</h2>
+                </div>
+                <span class="item-count">@Model.Attachments.Count files</span>
+            </div>
+
+            @if (Model.Attachments.Count == 0)
+            {
+                <div class="attachment-empty-state">
+                    <strong>No files available yet</strong>
+                    <p>This restaurant has not uploaded a menu or additional document.</p>
+                </div>
+            }
+            else
+            {
+                <div class="public-attachment-grid">
+                    @foreach (var attachment in Model.Attachments)
+                    {
+                        var isImage = attachment.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase);
+                        <article class="public-attachment-card">
+                            @if (isImage)
+                            {
+                                <a class="attachment-preview" href="@attachment.FilePath" target="_blank" rel="noopener">
+                                    <img src="@attachment.FilePath" alt="@attachment.FileName" />
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="attachment-file-icon" href="@attachment.FilePath" target="_blank" rel="noopener" aria-label="Open @attachment.FileName">
+                                    PDF
+                                </a>
+                            }
+
+                            <div class="attachment-card-content">
+                                <span class="card-kicker">@(isImage ? "Image" : "Document")</span>
+                                <h3 title="@attachment.FileName">@attachment.FileName</h3>
+                                <p>@($"{attachment.FileSize / 1024.0:F1} KB") · Added @attachment.CreatedAt.ToLocalTime().ToString("d.M.yyyy")</p>
+                                <a class="btn btn-outline" href="@attachment.FilePath" target="_blank" rel="noopener">Open file</a>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </div>
+
         @if (ViewBag.ErrorMessage != null)
         {
             <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
