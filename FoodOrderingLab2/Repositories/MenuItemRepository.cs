@@ -38,11 +38,6 @@ namespace FoodOrderingLab2.Repositories
                 .ToList();
         }
 
-        public int GetNextId()
-        {
-            return _context.MenuItems.Any() ? _context.MenuItems.Max(m => m.MenuItemId) + 1 : 1;
-        }
-
         public void AddRange(IEnumerable<MenuItem> items)
         {
             _context.MenuItems.AddRange(items);
@@ -51,11 +46,6 @@ namespace FoodOrderingLab2.Repositories
 
         public MenuItem Add(MenuItem item)
         {
-            if (item.MenuItemId == 0)
-            {
-                item.MenuItemId = GetNextId();
-            }
-
             _context.MenuItems.Add(item);
             _context.SaveChanges();
             return item;

@@ -5,6 +5,10 @@
             var api = $el.data('api');
             if (!api) return;
 
+            if ($el.hasClass('item-menu') || $el.is('[data-skip-autocomplete]')) {
+                return; // item menu selects are initialized by order form logic only
+            }
+
             var placeholderText = $el.data('placeholder') || 'Type to search...';
             var dropdownClass = $el.hasClass('item-menu') ? 'item-menu-dropdown' : '';
             var selectOptions = {

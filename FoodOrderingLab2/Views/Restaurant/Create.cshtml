@@ -6,7 +6,7 @@
     var categoryOptions = Enum.GetValues(typeof(FoodCategory)).Cast<FoodCategory>().ToList();
 }
 
-<div class="page-header">
+<div class="page-header page-header-center">
     <h1>Dodaj novi restoran</h1>
 </div>
 
@@ -29,7 +29,7 @@
 
         <div class="form-group">
             <label asp-for="Phone"></label>
-            <input asp-for="Phone" class="form-control" />
+            <input asp-for="Phone" class="form-control" placeholder="+385 1 123 4567" />
             <span asp-validation-for="Phone" class="text-danger"></span>
         </div>
 
@@ -47,30 +47,38 @@
 
         <div class="form-group">
             <label asp-for="OpeningHours"></label>
-            <input asp-for="OpeningHours" class="form-control" />
+            <input asp-for="OpeningHours" class="form-control" placeholder="09:00 - 22:00" />
             <span asp-validation-for="OpeningHours" class="text-danger"></span>
         </div>
 
         <div class="menu-items-section">
-            <h3>Menu items</h3>
+            <div class="menu-items-heading">
+                <div>
+                    <span class="detail-eyebrow">Restaurant menu</span>
+                    <h3>Menu items</h3>
+                </div>
+            </div>
+            <p class="form-help">Dodaj barem jedno jelo. Cijena mora biti veća od 0, a kalorije ne mogu biti negativne.</p>
+            <span asp-validation-for="MenuItems" class="text-danger"></span>
+            <div class="table-scroll">
             <table id="menu-items" class="menu-items-table">
                 <thead>
                     <tr>
-                        <th>Ime</th>
-                        <th>Opis</th>
-                        <th>Kategorija</th>
-                        <th>Cijena</th>
-                        <th>Kalorije</th>
-                        <th>Dostupno</th>
-                        <th></th>
+                        <th><span class="table-label">Name</span></th>
+                        <th><span class="table-label">Description</span></th>
+                        <th><span class="table-label">Category</span></th>
+                        <th><span class="table-label">Price</span></th>
+                        <th><span class="table-label">Calories</span></th>
+                        <th><span class="table-label">Available</span></th>
+                        <th><span class="table-label">Action</span></th>
                     </tr>
                 </thead>
                 <tbody>
                 @for (int i = 0; i < Model.MenuItems.Count; i++)
                 {
                     <tr>
-                        <td><input class="form-control" name="MenuItems[@i].Name" value="@Model.MenuItems[i].Name" /></td>
-                        <td><input class="form-control" name="MenuItems[@i].Description" value="@Model.MenuItems[i].Description" /></td>
+                        <td><input class="form-control" name="MenuItems[@i].Name" value="@Model.MenuItems[i].Name" required maxlength="150" /></td>
+                        <td><input class="form-control" name="MenuItems[@i].Description" value="@Model.MenuItems[i].Description" required maxlength="1000" /></td>
                         <td>
                             <select class="form-control" name="MenuItems[@i].Category">
                                 @foreach (var category in categoryOptions)
@@ -79,16 +87,16 @@
                                 }
                             </select>
                         </td>
-                        <td><input class="form-control" name="MenuItems[@i].Price" type="number" step="0.01" min="0" value="@Model.MenuItems[i].Price" /></td>
-                        <td><input class="form-control" name="MenuItems[@i].Calories" type="number" min="0" value="@Model.MenuItems[i].Calories" /></td>
-                        <td><input type="checkbox" name="MenuItems[@i].IsAvailable" value="true" @(Model.MenuItems[i].IsAvailable ? "checked" : "") /></td>
+                        <td><input class="form-control" name="MenuItems[@i].Price" type="number" step="0.01" min="0.01" max="9999.99" value="@Model.MenuItems[i].Price" required /></td>
+                        <td><input class="form-control" name="MenuItems[@i].Calories" type="number" min="0" max="10000" value="@Model.MenuItems[i].Calories" required /></td>
+                        <td><label class="availability-toggle"><input type="checkbox" name="MenuItems[@i].IsAvailable" value="true" @(Model.MenuItems[i].IsAvailable ? "checked" : "") /><span>Yes</span></label></td>
                         <td><button type="button" class="btn btn-danger btn-small remove-menu-item">Ukloni</button></td>
                     </tr>
                 }
 
                 <tr class="menu-item-row" style="display:none;">
-                    <td><input class="form-control" name="MenuItems[__index__].Name" /></td>
-                    <td><input class="form-control" name="MenuItems[__index__].Description" /></td>
+                    <td><input class="form-control" name="MenuItems[__index__].Name" required maxlength="150" /></td>
+                    <td><input class="form-control" name="MenuItems[__index__].Description" required maxlength="1000" /></td>
                     <td>
                         <select class="form-control" name="MenuItems[__index__].Category">
                             @foreach (var category in categoryOptions)
@@ -97,13 +105,14 @@
                             }
                         </select>
                     </td>
-                    <td><input class="form-control" name="MenuItems[__index__].Price" type="number" step="0.01" min="0" /></td>
-                    <td><input class="form-control" name="MenuItems[__index__].Calories" type="number" min="0" /></td>
-                    <td><input type="checkbox" name="MenuItems[__index__].IsAvailable" value="true" checked /></td>
+                    <td><input class="form-control" name="MenuItems[__index__].Price" type="number" step="0.01" min="0.01" max="9999.99" required /></td>
+                    <td><input class="form-control" name="MenuItems[__index__].Calories" type="number" min="0" max="10000" required /></td>
+                    <td><label class="availability-toggle"><input type="checkbox" name="MenuItems[__index__].IsAvailable" value="true" checked /><span>Yes</span></label></td>
                     <td><button type="button" class="btn btn-danger btn-small remove-menu-item">Ukloni</button></td>
                 </tr>
                     </tbody>
             </table>
+            </div>
 
             <div class="menu-item-actions">
                 <button type="button" id="add-menu-item" class="btn btn-secondary">Dodaj stavku</button>

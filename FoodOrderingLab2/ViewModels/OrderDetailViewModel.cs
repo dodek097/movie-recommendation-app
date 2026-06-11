@@ -4,9 +4,9 @@ namespace FoodOrderingLab2.ViewModels
 {
     public class OrderDetailViewModel
     {
-        public Order Order { get; set; }
-        public Customer Customer { get; set; }
-        public Restaurant Restaurant { get; set; }
+        public required Order Order { get; set; }
+        public required Customer Customer { get; set; }
+        public required Restaurant Restaurant { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

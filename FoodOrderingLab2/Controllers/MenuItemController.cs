@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using FoodOrderingLab2.Repositories;
 using FoodOrderingLab2.ViewModels;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodOrderingLab2.Controllers
 {
     [Route("meni")]
+    [Authorize]
     public class MenuItemController : Controller
     {
         private readonly MenuItemRepository _menuItemRepository;
@@ -19,6 +21,7 @@ namespace FoodOrderingLab2.Controllers
 
         [Route("")]
         [Route("restoran/{restaurantId:int}")]
+        [AllowAnonymous]
         public IActionResult Index(int restaurantId = 0)
         {
             List<Models.MenuItem> menuItems;
@@ -49,7 +52,7 @@ namespace FoodOrderingLab2.Controllers
             var viewModel = new MenuItemDetailViewModel
             {
                 MenuItem = menuItem,
-                Restaurant = restaurant
+                Restaurant = restaurant!
             };
 
             return View(viewModel);
@@ -57,6 +60,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpGet]
         [Route("create")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             ViewBag.Restaurants = _restaurantRepository.GetAll();
@@ -65,9 +69,15 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpPost]
         [Route("create")]
+        [Authorize(Roles = "Admin,Manager")]
         [ValidateAntiForgeryToken]
         public IActionResult Create(ViewModels.MenuItemCreateViewModel model)
         {
+            if (_restaurantRepository.GetById(model.RestaurantId) == null)
+            {
+                ModelState.AddModelError(nameof(model.RestaurantId), "Odabrani restoran ne postoji.");
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Restaurants = _restaurantRepository.GetAll();
@@ -91,6 +101,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpGet]
         [Route("edit/{id:int}")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Edit(int id)
         {
             var menuItem = _menuItemRepository.GetById(id);
@@ -116,6 +127,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpPost]
         [Route("edit/{id:int}")]
+        [Authorize(Roles = "Admin,Manager")]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, ViewModels.MenuItemCreateViewModel model)
         {
@@ -123,6 +135,11 @@ namespace FoodOrderingLab2.Controllers
             if (menuItem == null)
             {
                 return NotFound();
+            }
+
+            if (_restaurantRepository.GetById(model.RestaurantId) == null)
+            {
+                ModelState.AddModelError(nameof(model.RestaurantId), "Odabrani restoran ne postoji.");
             }
 
             if (!ModelState.IsValid)
@@ -145,6 +162,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpPost]
         [Route("delete/{id:int}")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
@@ -166,19 +184,30 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpGet]
         [Route("search")]
+        [AllowAnonymous]
         public IActionResult Search(string q, int? restaurantId)
         {
             q = q ?? string.Empty;
-            var items = restaurantId.HasValue && restaurantId.Value > 0
-                ? _menuItemRepository.GetByRestaurantId(restaurantId.Value).AsEnumerable()
-                : _menuItemRepository.GetAll().AsEnumerable();
+            var items = restaurantId.GetValueOrDefault() > 0
+            ? _menuItemRepository.GetByRestaurantId(restaurantId.GetValueOrDefault())
+            : _menuItemRepository.GetAll();
 
             var results = items
-                .Where(m => m.Name.Contains(q, System.StringComparison.InvariantCultureIgnoreCase)
-                            || m.Description.Contains(q, System.StringComparison.InvariantCultureIgnoreCase))
-                .Select(m => new { id = m.MenuItemId, text = m.Name, name = m.Name, category = m.Category, price = m.Price.ToString("F2"), description = m.Description })
-                .Take(10)
-                .ToList();
+            .Where(m =>
+                (m.Name ?? "").Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                (m.Description ?? "").Contains(q, StringComparison.OrdinalIgnoreCase))
+            .Select(m => new
+            {
+                id = m.MenuItemId,
+                text = m.Name,
+                name = m.Name,
+                category = m.Category.ToString(),
+                price = m.Price.ToString("F2"),
+                description = m.Description,
+                restaurantName = m.Restaurant?.Name
+            })
+            .Take(10)
+            .ToList();
 
             return Json(results);
         }

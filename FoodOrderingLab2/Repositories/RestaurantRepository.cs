@@ -25,12 +25,8 @@ namespace FoodOrderingLab2.Repositories
         {
             return _context.Restaurants
                 .Include(r => r.MenuItems)
+                .Include(r => r.Orders)
                 .FirstOrDefault(r => r.RestaurantId == id);
-        }
-
-        public int GetNextId()
-        {
-            return _context.Restaurants.Any() ? _context.Restaurants.Max(r => r.RestaurantId) + 1 : 1;
         }
 
         public void Add(Restaurant restaurant)

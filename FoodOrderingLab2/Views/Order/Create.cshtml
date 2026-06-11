@@ -10,18 +10,28 @@
 
 <div class="form-container">
     <form method="post" class="order-form">
+        @Html.AntiForgeryToken()
         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-        <div class="form-group">
-            <label for="customer-autocomplete">Kupac</label>
-            @{
-                ViewData["name"] = "CustomerId";
-                ViewData["id"] = "customer-autocomplete";
-                ViewData["apiUrl"] = "/kupci/search";
-            }
-            <partial name="_AutocompletePartial" />
-            <span asp-validation-for="CustomerId" class="text-danger"></span>
-        </div>
+        @if (ViewBag.IsStaff == true)
+        {
+            <div class="form-group">
+                <label for="customer-autocomplete">Kupac</label>
+                @{
+                    ViewData["name"] = "CustomerId";
+                    ViewData["id"] = "customer-autocomplete";
+                    ViewData["apiUrl"] = "/kupci/search";
+                    ViewData["placeholder"] = "Odaberi kupca";
+                    ViewData["required"] = true;
+                }
+                <partial name="_AutocompletePartial" />
+                <span asp-validation-for="CustomerId" class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <input asp-for="CustomerId" type="hidden" />
+        }
 
         <div class="form-group">
             <label for="restaurant-autocomplete">Restoran</label>
@@ -29,6 +39,8 @@
                 ViewData["name"] = "RestaurantId";
                 ViewData["id"] = "restaurant-autocomplete";
                 ViewData["apiUrl"] = "/restorani/search";
+                ViewData["placeholder"] = "Odaberi restoran";
+                ViewData["required"] = true;
             }
             <partial name="_AutocompletePartial" />
             <span asp-validation-for="RestaurantId" class="text-danger"></span>
@@ -38,29 +50,34 @@
             <label for="order-date">Datum narudžbe</label>
             @{
                 ViewData["name"] = "OrderDate";
-                ViewData["value"] = Model?.OrderDate.ToString("d.M.yyyy H:mm") ?? DateTime.Now.ToString("d.M.yyyy H:mm");
+                ViewData["date"] = Model?.OrderDate ?? DateTime.Now;
             }
             <partial name="_DateTimePartial" />
             <span asp-validation-for="OrderDate" class="text-danger"></span>
         </div>
 
         <h3>Stavke narudžbe</h3>
-        <table id="order-items" class="table">
-            <thead>
-                <tr><th>Artikl</th><th>Količina</th><th>Napomena</th><th></th></tr>
-            </thead>
-            <tbody>
-                <tr class="order-item-row" style="display:none;">
-                    <td data-label="Artikl">
-                        <select class="form-control autocomplete-select item-menu" data-api="/meni/search" data-placeholder="Odaberi artikl" name="Items[__index__].MenuItemId" style="width:100%"></select>
-                    </td>
-                    <td data-label="Količina"><input type="number" min="1" value="1" class="form-control" name="Items[__index__].Quantity" /></td>
-                    <td data-label="Napomena"><input type="text" class="form-control" name="Items[__index__].SpecialRequests" /></td>
-                    <td data-label="Akcija"><button type="button" class="btn btn-danger btn-small remove-item">Ukloni</button></td>
-                </tr>
-            </tbody>
-        </table>
-        <div style="margin-bottom: 1rem;"><button type="button" id="add-item" class="btn btn-secondary">Dodaj stavku</button></div>
+        <div id="order-items-placeholder" class="alert alert-info">
+            Odaberi restoran da bi mogao dodati stavke u narudžbu.
+        </div>
+        <div id="order-items-container" class="d-none">
+            <table id="order-items" class="table">
+                <thead>
+                    <tr><th>Artikl</th><th>Količina</th><th>Napomena</th><th></th></tr>
+                </thead>
+                <tbody>
+                    <tr class="order-item-row d-none">
+                        <td data-label="Artikl">
+                            <select class="form-control autocomplete-select item-menu" data-api="/meni/search" data-placeholder="Odaberi artikl" name="Items[__index__].MenuItemId" data-skip-autocomplete="true" style="width:100%" required disabled><option value=""></option></select>
+                        </td>
+                        <td data-label="Količina"><input type="number" min="1" value="1" class="form-control" name="Items[__index__].Quantity" required disabled /></td>
+                        <td data-label="Napomena"><input type="text" class="form-control" name="Items[__index__].SpecialRequests" maxlength="500" disabled /></td>
+                        <td data-label="Akcija"><button type="button" class="btn btn-danger btn-small remove-item">Ukloni</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-bottom: 1rem;"><button type="button" id="add-item" class="btn btn-secondary">Dodaj stavku</button></div>
+        </div>
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Spremi narudžbu</button>
@@ -82,7 +99,35 @@
                 }
 
                 function initMenuItemSelect($s){
+                    // destroy existing select2 if present
+                    if ($s.hasClass('select2-hidden-accessible')) {
+                        $s.select2('destroy');
+                    }
+
                     var placeholder = $s.data('placeholder') || 'Odaberi artikl';
+                    var restaurantId = getSelectedRestaurantId();
+
+                    // ensure an empty option exists so placeholder shows
+                    if ($s.find('option[value=""]').length === 0) {
+                        $s.prepend('<option value=""></option>');
+                    }
+
+                    // if no restaurant selected, disable the select and init simple select2
+                    if (!restaurantId) {
+                        $s.prop('disabled', true);
+                        $s.val('');
+                        $s.select2({
+                            dropdownParent: $('body'),
+                            minimumInputLength: 0,
+                            width: '100%',
+                            placeholder: placeholder,
+                            allowClear: true
+                        });
+                        return;
+                    }
+
+                    // enable and initialize ajax-backed select2 when restaurant selected
+                    $s.prop('disabled', false);
                     $s.select2({
                         ajax: {
                             url: $s.data('api'),
@@ -91,7 +136,7 @@
                             data: function(params){
                                 return {
                                     q: params.term || '',
-                                    restaurantId: getSelectedRestaurantId()
+                                    restaurantId: restaurantId
                                 };
                             },
                             processResults: function(d){ return { results: d }; }
@@ -102,11 +147,26 @@
                         placeholder: placeholder,
                         allowClear: true
                     });
+
+                    // make sure selected item shows its text (safeguard for AJAX mode)
+                    $s.on('select2:select', function(e){
+                        var data = e.params && e.params.data;
+                        if (data && data.id) {
+                            var option = new Option(data.text || data.name || data.text, data.id, true, true);
+                            $s.append(option).trigger('change.select2');
+                        }
+                    });
+                }
+
+                function updateOrderArea(){
+                    var hasRestaurant = !!getSelectedRestaurantId();
+                    $('#order-items-container').toggleClass('d-none', !hasRestaurant);
+                    $('#order-items-placeholder').toggleClass('d-none', hasRestaurant);
+                    $('#add-item').prop('disabled', !hasRestaurant);
                 }
 
                 function updateItemControls(){
-                    var hasRestaurant = !!getSelectedRestaurantId();
-                    $('#add-item').prop('disabled', !hasRestaurant);
+                    updateOrderArea();
                 }
 
                 function markFieldValidity($field, isValid){
@@ -141,6 +201,15 @@
                     });
                 }
 
+                function reindexRows(){
+                    $('#order-items tbody tr').not('.order-item-row').each(function(index){
+                        $(this).find('select[name$=".MenuItemId"]').attr('name', 'Items[' + index + '].MenuItemId');
+                        $(this).find('input[name$=".Quantity"]').attr('name', 'Items[' + index + '].Quantity');
+                        $(this).find('input[name$=".SpecialRequests"]').attr('name', 'Items[' + index + '].SpecialRequests');
+                    });
+                    idx = $('#order-items tbody tr').not('.order-item-row').length;
+                }
+
                 function animateRowIn($row){
                     $row.addClass('new-row');
                     requestAnimationFrame(function(){
@@ -152,31 +221,60 @@
                     $row.addClass('removing');
                     window.setTimeout(function(){
                         $row.remove();
+                        reindexRows();
                     }, 240);
                 }
 
-                function addRow(){
-                    var restaurantId = getSelectedRestaurantId();
-                    if (!restaurantId) {
-                        return;
-                    }
-                    var $template = $('.order-item-row').clone().removeClass('order-item-row').show();
-                    var html = $template.html().replace(/__index__/g, idx);
-                    var $tr = $('<tr></tr>').html(html).addClass('new-row');
-                    $('#order-items tbody').append($tr);
-                    $tr.find('.autocomplete-select').each(function(){
-                        initMenuItemSelect($(this));
-                    });
-                    bindRowValidation($tr);
-                    requestAnimationFrame(function(){
-                        $tr.addClass('animate-in');
-                    });
-                    idx++;
-                }
+                function getRowHtml(index){
+    return `
+    <tr class="new-row">
+        <td data-label="Artikl">
+            <select class="form-control autocomplete-select item-menu"
+                data-api="/meni/search"
+                data-placeholder="Odaberi artikl"
+                name="Items[${index}].MenuItemId"
+                style="width:100%" required><option value=""></option></select>
+        </td>
+        <td data-label="Količina">
+            <input type="number" min="1" value="1"
+                class="form-control"
+                name="Items[${index}].Quantity" required />
+        </td>
+        <td data-label="Napomena">
+            <input type="text" class="form-control" maxlength="500"
+                name="Items[${index}].SpecialRequests" />
+        </td>
+        <td data-label="Akcija">
+            <button type="button" class="btn btn-danger btn-small remove-item">Ukloni</button>
+        </td>
+    </tr>`;
+}
+
+function addRow(){
+    var restaurantId = getSelectedRestaurantId();
+    if (!restaurantId) return;
+
+    var $tr = $(getRowHtml(idx));
+
+    $('#order-items tbody').append($tr);
+
+    $tr.find('.autocomplete-select').each(function(){
+        initMenuItemSelect($(this));
+    });
+
+    bindRowValidation($tr);
+
+    requestAnimationFrame(function(){
+        $tr.addClass('animate-in');
+    });
+
+    idx++;
+}
 
                 $('#restaurant-autocomplete').on('change', function(){
                     $('#order-items tbody tr').not('.order-item-row').remove();
-                    updateItemControls();
+                    reindexRows();
+                    updateOrderArea();
                     if (getSelectedRestaurantId()) {
                         addRow();
                     }
@@ -188,7 +286,7 @@
                     animateRowOut($row);
                 });
 
-                updateItemControls();
+                updateOrderArea();
                 if (getSelectedRestaurantId() && $('#order-items tbody tr').not('.order-item-row').length === 0) {
                     addRow();
                 }
@@ -205,7 +303,8 @@
                         var menu = $(this).find('select[name$=".MenuItemId"]').val();
                         var qty = parseInt($(this).find('input[name$=".Quantity"]').val() || '0');
                         if (!menu || menu === '' || qty <= 0) {
-                        validateOrderRow($(this));
+                            validateOrderRow($(this));
+                            valid = false;
                             return false;
                         }
                     });

@@ -1,36 +1,51 @@
 @model FoodOrderingLab2.ViewModels.MenuItemDetailViewModel
 @{ ViewData["Title"] = Model.MenuItem.Name; }
+
 <section class="detail-page">
-    <div class="card detail-card">
-        <div class="detail-card-header">
+    <div class="detail-card detail-surface">
+        <div class="detail-hero">
             <div>
-                <span class="detail-subtitle">Menu item</span>
+                <span class="detail-eyebrow">@Model.MenuItem.Category</span>
                 <h1>@Model.MenuItem.Name</h1>
+                <p class="detail-lead">@Model.MenuItem.Description</p>
             </div>
-            <div class="detail-meta">
-                <span>Price: <strong>@Model.MenuItem.Price.ToString("F2")</strong></span>
-                <span>Calories: <strong>@Model.MenuItem.Calories</strong></span>
+            <div class="price-panel">
+                <span>Price</span>
+                <strong>@Model.MenuItem.Price.ToString("F2") EUR</strong>
+                <small>@(Model.MenuItem.IsAvailable ? "Available to order" : "Currently unavailable")</small>
             </div>
+        </div>
+
+        <div class="metric-grid">
+            <div class="metric-card"><span>Calories</span><strong>@Model.MenuItem.Calories kcal</strong></div>
+            <div class="metric-card"><span>Category</span><strong>@Model.MenuItem.Category</strong></div>
+            <div class="metric-card"><span>Availability</span><strong>@(Model.MenuItem.IsAvailable ? "Available" : "Unavailable")</strong></div>
         </div>
 
         <div class="detail-section">
-            <h2>Description</h2>
-            <p>@Model.MenuItem.Description</p>
+            <span class="detail-eyebrow">Prepared by</span>
+            <h2>@Model.Restaurant?.Name</h2>
+            <div class="contact-grid">
+                <div class="contact-card"><span>Address</span><strong>@Model.Restaurant?.Address</strong></div>
+                <div class="contact-card"><span>Phone</span><strong>@Model.Restaurant?.Phone</strong></div>
+            </div>
         </div>
 
-        <div class="detail-section">
-            <h2>Restaurant</h2>
-            <p class="detail-subtitle">@Model.Restaurant?.Name</p>
-            <p>@Model.Restaurant?.Address</p>
-        </div>
-
-        <div class="detail-action">
+        <div class="detail-action action-bar">
             <a class="btn btn-secondary" asp-controller="MenuItem" asp-action="Index">Back to menu</a>
-            <a class="btn btn-secondary" asp-controller="MenuItem" asp-action="Edit" asp-route-id="@Model.MenuItem.MenuItemId">Edit</a>
-            <form asp-controller="MenuItem" asp-action="Delete" asp-route-id="@Model.MenuItem.MenuItemId" method="post" class="d-inline-block" onsubmit="return confirm('Jeste li sigurni da želite obrisati stavku menija?');">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
+            <div class="action-bar-right">
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
+                    <a class="btn btn-outline" asp-controller="MenuItem" asp-action="Edit" asp-route-id="@Model.MenuItem.MenuItemId">Edit</a>
+                }
+                @if (User.IsInRole("Admin"))
+                {
+                    <form asp-controller="MenuItem" asp-action="Delete" asp-route-id="@Model.MenuItem.MenuItemId" method="post" class="d-inline-block" onsubmit="return confirm('Jeste li sigurni da želite obrisati stavku menija?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                }
+            </div>
         </div>
     </div>
 </section>

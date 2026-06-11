@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 </head>
-<body>
+<body data-can-manage="@((User.IsInRole("Admin") || User.IsInRole("Manager")).ToString().ToLowerInvariant())"
+      data-can-delete="@(User.IsInRole("Admin").ToString().ToLowerInvariant())">
     <!-- Navigation Header -->
     <header class="app-header">
         <nav class="navbar-custom">
@@ -38,28 +39,31 @@
                                 Menu Items
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a asp-controller="Order" asp-action="Index" class="nav-link">
-                                Orders
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="Customer" asp-action="Index" class="nav-link">
-                                Customers
-                            </a>
-                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a asp-controller="Order" asp-action="Index" class="nav-link">Orders</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                        {
+                            <li class="nav-item">
+                                <a asp-controller="Customer" asp-action="Index" class="nav-link">Customers</a>
+                            </li>
+                        }
                     </ul>
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
 
     <!-- Breadcrumbs Navigation -->
-    @if (ViewData["Breadcrumbs"] != null)
+    @if (ViewData["Breadcrumbs"] is List<(string text, string url)> breadcrumbs)
     {
         <nav class="breadcrumbs-container" aria-label="Breadcrumb">
             <ol class="breadcrumbs">
-                @foreach (var breadcrumb in (List<(string text, string url)>)ViewData["Breadcrumbs"])
+                @foreach (var breadcrumb in breadcrumbs)
                 {
                     <li class="breadcrumb-item">
                         @if (!string.IsNullOrEmpty(breadcrumb.url))
@@ -118,11 +122,11 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <div id="global-toast" style="display:none;position:fixed;right:1rem;bottom:1rem;background:#222;color:#fff;padding:0.75rem 1rem;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.4);z-index:1200;"></div>
 
-    @if (TempData["SuccessMessage"] != null)
+    @if (TempData["SuccessMessage"] is string successMessage)
     {
         <script>
             (function(){
-                var msg = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["SuccessMessage"].ToString()));
+                var msg = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(successMessage));
                 document.getElementById('global-toast').textContent = msg;
                 var el = document.getElementById('global-toast');
                 el.style.display = 'block';

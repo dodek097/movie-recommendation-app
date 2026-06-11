@@ -1,0 +1,48 @@
+@page
+@model FoodOrderingLab2.Areas.Identity.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = Model.IsProfileRecovery ? "Obnova profila" : "Registracija";
+}
+
+<div class="form-container identity-form identity-form-wide">
+    <div class="form-heading">
+        <span class="detail-subtitle">@(Model.IsProfileRecovery ? "Postojeći korisnički račun" : "Novi korisnički račun")</span>
+        <h1>@(Model.IsProfileRecovery ? "Obnovi profil kupca" : "Registracija")</h1>
+        <p>@(Model.IsProfileRecovery ? "Tvoj login račun postoji, ali profil kupca nedostaje. Unesi podatke potrebne za naručivanje." : "Podaci se koriste za tvoj profil kupca i dostavu narudžbi.")</p>
+    </div>
+    <form method="post" class="form-grid">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="form-group"><label asp-for="Input.FirstName"></label><input asp-for="Input.FirstName" class="form-control" /><span asp-validation-for="Input.FirstName" class="text-danger"></span></div>
+        <div class="form-group"><label asp-for="Input.LastName"></label><input asp-for="Input.LastName" class="form-control" /><span asp-validation-for="Input.LastName" class="text-danger"></span></div>
+
+        @if (!Model.IsProfileRecovery)
+        {
+            <div class="form-group"><label asp-for="Input.Email"></label><input asp-for="Input.Email" class="form-control" placeholder="ime@primjer.hr" /><span asp-validation-for="Input.Email" class="text-danger"></span></div>
+        }
+
+        <div class="form-group"><label asp-for="Input.Phone"></label><input asp-for="Input.Phone" class="form-control" placeholder="+385 91 123 4567" /><span asp-validation-for="Input.Phone" class="text-danger"></span></div>
+        <div class="form-group form-grid-full"><label asp-for="Input.Address"></label><input asp-for="Input.Address" class="form-control" placeholder="Ulica i kućni broj, grad" /><span asp-validation-for="Input.Address" class="text-danger"></span></div>
+
+        @if (!Model.IsProfileRecovery)
+        {
+            <div class="form-group"><label asp-for="Input.OIB"></label><input asp-for="Input.OIB" class="form-control" inputmode="numeric" placeholder="11 znamenki" /><span asp-validation-for="Input.OIB" class="text-danger"></span></div>
+            <div class="form-group"><label asp-for="Input.JMBG"></label><input asp-for="Input.JMBG" class="form-control" inputmode="numeric" placeholder="13 znamenki" /><span asp-validation-for="Input.JMBG" class="text-danger"></span></div>
+            <div class="form-group"><label asp-for="Input.Password"></label><input asp-for="Input.Password" class="form-control" /><span asp-validation-for="Input.Password" class="text-danger"></span></div>
+            <div class="form-group"><label asp-for="Input.ConfirmPassword"></label><input asp-for="Input.ConfirmPassword" class="form-control" /><span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span></div>
+        }
+
+        <div class="form-grid-full"><button type="submit" class="btn btn-primary btn-block">@(Model.IsProfileRecovery ? "Obnovi profil" : "Registriraj se")</button></div>
+    </form>
+
+    @if (!Model.IsProfileRecovery && Model.ExternalLogins.Count > 0)
+    {
+        <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            @foreach (var provider in Model.ExternalLogins)
+            {
+                <button type="submit" class="btn btn-outline btn-block" name="provider" value="@provider.Name">Registracija preko @provider.DisplayName</button>
+            }
+        </form>
+    }
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

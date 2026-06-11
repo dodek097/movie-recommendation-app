@@ -4,7 +4,7 @@ namespace FoodOrderingLab2.ViewModels
 {
     public class MenuItemDetailViewModel
     {
-        public MenuItem MenuItem { get; set; }
-        public Restaurant Restaurant { get; set; }
+        public required MenuItem MenuItem { get; set; }
+        public required Restaurant Restaurant { get; set; }
     }
 }

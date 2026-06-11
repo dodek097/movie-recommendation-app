@@ -4,9 +4,12 @@
     var selectedId = ViewData["selectedId"]?.ToString() ?? "";
     var selectedText = ViewData["selectedText"] as string ?? "";
     var id = ViewData["id"] as string ?? name;
+    var placeholder = ViewData["placeholder"] as string ?? "Type to search...";
+    var required = ViewData["required"] as bool? ?? false;
 }
 
-<select id="@id" class="form-control autocomplete-select" name="@name" data-api="@apiUrl" style="width:100%">
+<select id="@id" class="form-control autocomplete-select" name="@name" data-api="@apiUrl" data-placeholder="@placeholder" style="width:100%" @(required ? "required" : "")>
+    <option value=""></option>
     @if (!string.IsNullOrEmpty(selectedId))
     {
         <option value="@selectedId" selected="selected">@selectedText</option>

@@ -6,13 +6,15 @@ namespace FoodOrderingLab2.Models
     public class OrderItem
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int OrderItemId { get; set; }
 
         public int OrderId { get; set; }
         public int MenuItemId { get; set; }
+        [Range(1, int.MaxValue)]
         public int Quantity { get; set; }
+        [Range(0.01, 9999.99)]
         public decimal UnitPrice { get; set; }
+        [StringLength(500)]
         public string? SpecialRequests { get; set; }
 
         // Relationships

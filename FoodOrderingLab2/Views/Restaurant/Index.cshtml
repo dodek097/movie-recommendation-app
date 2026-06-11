@@ -1,9 +1,12 @@
 @model List<FoodOrderingLab2.Models.Restaurant>
 @{ ViewData["Title"] = "Restaurants"; }
-<div class="page-header">
+<div class="page-header page-header-center">
     <h1>All Restaurants</h1>
     <div class="page-header-center">
-        <a asp-controller="Restaurant" asp-action="Create" class="btn btn-primary btn-large">+ Novi restoran</a>
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <a asp-controller="Restaurant" asp-action="Create" class="btn btn-primary btn-large">+ Novi restoran</a>
+        }
         <div class="search-row">
             <input type="search" class="search-input" placeholder="Search restaurants..." data-search-api="/restorani/search" data-search-template="restaurant" data-search-target="#restaurant-results" autocomplete="off" />
         </div>
@@ -11,21 +14,28 @@
 </div>
 <div class="search-grid" id="restaurant-results">
 @foreach (var restaurant in Model) {
-    <div class="card">
+    <div class="card entity-card">
         <div class="card-header">
+            <span class="card-kicker">Restaurant</span>
             <h3 class="card-title">@restaurant.Name</h3>
         </div>
         <div class="card-body">
-            <p class="card-description"><strong>Rating:</strong> @restaurant.Rating</p>
-            <p class="card-description">@restaurant.Address</p>
+            <div class="card-stat-row"><span>Rating</span><strong>@restaurant.Rating.ToString("F2") / 5</strong></div>
+            <div class="card-stat-row"><span>Address</span><strong>@restaurant.Address</strong></div>
         </div>
         <div class="card-footer">
             <a asp-controller="Restaurant" asp-action="Details" asp-route-id="@restaurant.RestaurantId" class="btn btn-secondary">View</a>
-            <a asp-controller="Restaurant" asp-action="Edit" asp-route-id="@restaurant.RestaurantId" class="btn btn-outline">Edit</a>
-            <form asp-controller="Restaurant" asp-action="Delete" asp-route-id="@restaurant.RestaurantId" method="post" style="display:inline;">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Jeste li sigurni da želite obrisati ovaj restoran?');">Delete</button>
-            </form>
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                <a asp-controller="Restaurant" asp-action="Edit" asp-route-id="@restaurant.RestaurantId" class="btn btn-outline">Edit</a>
+            }
+            @if (User.IsInRole("Admin"))
+            {
+                <form asp-controller="Restaurant" asp-action="Delete" asp-route-id="@restaurant.RestaurantId" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Jeste li sigurni da želite obrisati ovaj restoran?');">Delete</button>
+                </form>
+            }
         </div>
     </div>
 }

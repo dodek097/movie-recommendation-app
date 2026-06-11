@@ -7,22 +7,30 @@
         <a asp-controller="Order" asp-action="Create" class="btn btn-primary btn-large">+ Kreiraj narudžbu</a>
     </div>
     <div class="search-row">
-        <input type="search" class="search-input" placeholder="Search orders..." data-search-api="/narudzbe/search" data-search-template="order" data-search-target="#order-results" autocomplete="off" />
+        <input type="search" class="search-input" placeholder="Pretraži po broju, kupcu, restoranu ili statusu..." data-search-api="/narudzbe/search" data-search-template="order" data-search-target="#order-results" autocomplete="off" />
     </div>
 </div>
 
 <div class="order-grid search-grid" id="order-results">
 @foreach (var order in Model) {
-    <div class="order-card">
-        <h3>Narudžba #@order.OrderId</h3>
-        <p><strong>Kupac:</strong> @order.Customer?.FullName</p>
-        <p><strong>Restoran:</strong> @order.Restaurant?.Name</p>
-        <p><strong>Status:</strong> @order.Status</p>
-        <p><strong>Cijena:</strong> @order.TotalPrice.ToString("F2") EUR</p>
-        <p><strong>Datum:</strong> @order.OrderDate.ToString("d.M.yyyy H:mm")</p>
-        <div class="btn-group-inline" style="margin-top: 10px;">
-            <a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-secondary">Pregled</a>
-            <a asp-controller="Order" asp-action="Edit" asp-route-id="@order.OrderId" class="btn btn-secondary">Uredi</a>
+    <div class="order-card entity-card">
+        <div class="order-card-heading">
+            <div>
+                <span class="card-kicker">Order</span>
+                <h3>Narudžba #@order.OrderId</h3>
+            </div>
+            <span class="status-badge">@order.Status</span>
+        </div>
+        <div class="card-stat-row"><span>Kupac</span><strong>@order.Customer?.FullName</strong></div>
+        <div class="card-stat-row"><span>Restoran</span><strong>@order.Restaurant?.Name</strong></div>
+        <div class="card-stat-row"><span>Cijena</span><strong class="price-emphasis">@order.TotalPrice.ToString("F2") EUR</strong></div>
+        <div class="card-stat-row"><span>Datum</span><strong>@order.OrderDate.ToString("d.M.yyyy H:mm")</strong></div>
+        <div class="btn-group-inline card-actions">
+            <a asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-secondary">View</a>
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                <a asp-controller="Order" asp-action="Edit" asp-route-id="@order.OrderId" class="btn btn-outline">Edit</a>
+            }
         </div>
     </div>
 }

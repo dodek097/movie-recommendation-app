@@ -2,20 +2,27 @@ using Microsoft.AspNetCore.Mvc;
 using FoodOrderingLab2.Repositories;
 using FoodOrderingLab2.ViewModels;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using FoodOrderingLab2.Models;
 
 namespace FoodOrderingLab2.Controllers
 {
     [Route("kupci")]
+    [Authorize]
     public class CustomerController : Controller
     {
         private readonly CustomerRepository _customerRepository;
+        private readonly UserManager<AppUser> _userManager;
 
-        public CustomerController(CustomerRepository customerRepository)
+        public CustomerController(CustomerRepository customerRepository, UserManager<AppUser> userManager)
         {
             _customerRepository = customerRepository;
+            _userManager = userManager;
         }
 
         [Route("")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Index()
         {
             var customers = _customerRepository.GetAll();
@@ -24,6 +31,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpGet]
         [Route("create")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new CustomerCreateViewModel
@@ -35,6 +43,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpPost]
         [Route("create")]
+        [Authorize(Roles = "Admin,Manager")]
         [ValidateAntiForgeryToken]
         public IActionResult Create(CustomerCreateViewModel model)
         {
@@ -45,7 +54,6 @@ namespace FoodOrderingLab2.Controllers
 
             var customer = new Models.Customer
             {
-                CustomerId = _customerRepository.GetNextId(),
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Email = model.Email,
@@ -60,6 +68,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpGet]
         [Route("edit/{id:int}")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Edit(int id)
         {
             var customer = _customerRepository.GetById(id);
@@ -84,6 +93,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpPost]
         [Route("edit/{id:int}")]
+        [Authorize(Roles = "Admin,Manager")]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, CustomerCreateViewModel model)
         {
@@ -112,8 +122,9 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpPost]
         [Route("delete/{id:int}")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var customer = _customerRepository.GetById(id);
             if (customer == null)
@@ -127,11 +138,26 @@ namespace FoodOrderingLab2.Controllers
                 return RedirectToAction("Details", new { id });
             }
 
+            if (!string.IsNullOrWhiteSpace(customer.AppUserId))
+            {
+                var appUser = await _userManager.FindByIdAsync(customer.AppUserId);
+                if (appUser != null)
+                {
+                    var result = await _userManager.DeleteAsync(appUser);
+                    if (!result.Succeeded)
+                    {
+                        TempData["ErrorMessage"] = "Korisnički račun nije moguće obrisati.";
+                        return RedirectToAction("Details", new { id });
+                    }
+                }
+            }
+
             _customerRepository.Delete(customer);
             return RedirectToAction("Index");
         }
 
         [Route("{id:int}")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Details(int id)
         {
             var customer = _customerRepository.GetById(id);
@@ -146,6 +172,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpGet]
         [Route("search")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Search(string q)
         {
             q = q ?? string.Empty;
@@ -158,6 +185,61 @@ namespace FoodOrderingLab2.Controllers
                 .ToList();
 
             return Json(results);
+        }
+
+        [HttpGet]
+        [Route("moj-profil")]
+        public IActionResult MyProfile()
+        {
+            var customer = CurrentCustomer;
+            if (customer == null)
+            {
+                return RedirectToPage("/Account/Register", new { area = "Identity" });
+            }
+
+            ViewBag.Email = customer.Email;
+            return View(new CustomerProfileViewModel
+            {
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Phone = customer.Phone,
+                Address = customer.Address
+            });
+        }
+
+        [HttpPost]
+        [Route("moj-profil")]
+        [ValidateAntiForgeryToken]
+        public IActionResult MyProfile(CustomerProfileViewModel model)
+        {
+            var customer = CurrentCustomer;
+            if (customer == null)
+            {
+                return RedirectToPage("/Account/Register", new { area = "Identity" });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Email = customer.Email;
+                return View(model);
+            }
+
+            customer.FirstName = model.FirstName;
+            customer.LastName = model.LastName;
+            customer.Phone = model.Phone;
+            customer.Address = model.Address;
+            _customerRepository.Update(customer);
+            TempData["SuccessMessage"] = "Profil je spremljen.";
+            return RedirectToAction(nameof(MyProfile));
+        }
+
+        private Customer? CurrentCustomer
+        {
+            get
+            {
+                var userId = _userManager.GetUserId(User);
+                return string.IsNullOrWhiteSpace(userId) ? null : _customerRepository.GetByAppUserId(userId);
+            }
         }
     }
 }

@@ -32,7 +32,7 @@
 
         <div class="form-group">
             <label asp-for="Description"></label>
-            <input asp-for="Description" class="form-control" />
+            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
@@ -49,20 +49,20 @@
 
         <div class="form-group">
             <label asp-for="Price"></label>
-            <input asp-for="Price" class="form-control" type="number" step="0.01" min="0" />
+            <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" max="9999.99" />
             <span asp-validation-for="Price" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Calories"></label>
-            <input asp-for="Calories" class="form-control" type="number" min="0" />
+            <input asp-for="Calories" class="form-control" type="number" min="0" max="10000" />
             <span asp-validation-for="Calories" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label class="checkbox-label">
                 <input asp-for="IsAvailable" type="checkbox" />
-                <span> Dopušteno</span>
+                <span>Dostupno za naručivanje</span>
             </label>
         </div>
 

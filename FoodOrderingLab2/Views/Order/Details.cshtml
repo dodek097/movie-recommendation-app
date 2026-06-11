@@ -1,45 +1,70 @@
 @model FoodOrderingLab2.ViewModels.OrderDetailViewModel
 @{ ViewData["Title"] = "Order #" + Model.Order.OrderId; }
+
 <section class="detail-page">
-    <div class="card detail-card">
-        <div class="detail-card-header">
+    <div class="detail-card detail-surface">
+        <div class="detail-hero">
             <div>
-                <span class="detail-subtitle">Order details</span>
-                <h1>Order #@Model.Order.OrderId</h1>
+                <span class="detail-eyebrow">Order details</span>
+                <h1>Narudžba #@Model.Order.OrderId</h1>
+                <p class="detail-lead">Kreirana @Model.Order.OrderDate.ToString("d.M.yyyy 'u' H:mm")</p>
             </div>
-            <div class="detail-meta">
-                <span>Status: <strong>@Model.Order.Status</strong></span>
-                <span>Total: <strong>@Model.Order.TotalPrice.ToString("F2")</strong></span>
-                <span>Date: <strong>@Model.Order.OrderDate.ToString("MMM dd, yyyy")</strong></span>
+            <div class="price-panel">
+                <span>Total</span>
+                <strong>@Model.Order.TotalPrice.ToString("F2") EUR</strong>
+                <small class="status-badge">@Model.Order.Status</small>
             </div>
         </div>
 
         <div class="detail-two-col detail-section">
-            <div>
-                <h2>Customer</h2>
-                <p class="detail-subtitle">@Model.Customer?.FullName</p>
+            <div class="info-panel">
+                <span class="detail-eyebrow">Customer</span>
+                <h2>@Model.Customer?.FullName</h2>
                 <p>@Model.Customer?.Email</p>
                 <p>@Model.Customer?.Phone</p>
+                <p>@Model.Customer?.Address</p>
             </div>
-            <div>
-                <h2>Restaurant</h2>
-                <p class="detail-subtitle">@Model.Restaurant?.Name</p>
+            <div class="info-panel">
+                <span class="detail-eyebrow">Restaurant</span>
+                <h2>@Model.Restaurant?.Name</h2>
                 <p>@Model.Restaurant?.Address</p>
+                <p>@Model.Restaurant?.Email</p>
+                <p>@Model.Restaurant?.Phone</p>
             </div>
         </div>
 
         <div class="detail-section">
-            <h2>Items</h2>
-            <ul class="detail-list">
+            <div class="section-heading">
+                <div>
+                    <span class="detail-eyebrow">Order contents</span>
+                    <h2>Stavke narudžbe</h2>
+                </div>
+                <span class="item-count">@Model.OrderItems.Sum(x => x.Quantity) items</span>
+            </div>
+            <div class="order-item-list">
                 @foreach (var item in Model.OrderItems)
                 {
-                    <li>@item.MenuItem?.Name x@item.Quantity = @item.TotalItemPrice.ToString("F2")</li>
+                    <div class="order-detail-item">
+                        <div>
+                            <strong>@item.MenuItem?.Name</strong>
+                            @if (!string.IsNullOrWhiteSpace(item.SpecialRequests))
+                            {
+                                <small>@item.SpecialRequests</small>
+                            }
+                        </div>
+                        <span>@item.Quantity × @item.UnitPrice.ToString("F2") EUR</span>
+                        <strong>@item.TotalItemPrice.ToString("F2") EUR</strong>
+                    </div>
                 }
-            </ul>
+            </div>
         </div>
 
-        <div class="detail-action">
+        <div class="detail-action action-bar">
             <a class="btn btn-secondary" asp-controller="Order" asp-action="Index">Back to orders</a>
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                <a class="btn btn-outline" asp-controller="Order" asp-action="Edit" asp-route-id="@Model.Order.OrderId">Edit order</a>
+            }
         </div>
     </div>
 </section>

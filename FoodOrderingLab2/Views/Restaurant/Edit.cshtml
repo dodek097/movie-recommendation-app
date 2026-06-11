@@ -4,9 +4,24 @@
     var restaurantId = ViewBag.RestaurantId as int? ?? 0;
 }
 
-<div class="page-header">
+<div class="page-header page-header-center">
     <h1>Uredi restoran</h1>
 </div>
+
+<section class="form-container attachment-section">
+    <h2>Datoteke restorana</h2>
+    <p class="color-text-light">Dodaj sliku, PDF jelovnik ili dokument. Maksimalna veličina je 10 MB.</p>
+    <form id="attachment-upload-form" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <label id="attachment-dropzone" class="attachment-dropzone" for="attachment-file">
+            <strong>Povuci datoteku ovdje</strong>
+            <span>ili klikni za odabir</span>
+            <input id="attachment-file" name="file" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" hidden />
+        </label>
+    </form>
+    <div id="attachment-status" class="color-text-light"></div>
+    <div id="attachment-list"></div>
+</section>
 
 <div class="form-container">
     <form asp-action="Edit" asp-route-id="@restaurantId" method="post">
@@ -27,7 +42,7 @@
 
         <div class="form-group">
             <label asp-for="Phone"></label>
-            <input asp-for="Phone" class="form-control" />
+            <input asp-for="Phone" class="form-control" placeholder="+385 1 123 4567" />
             <span asp-validation-for="Phone" class="text-danger"></span>
         </div>
 
@@ -45,7 +60,7 @@
 
         <div class="form-group">
             <label asp-for="OpeningHours"></label>
-            <input asp-for="OpeningHours" class="form-control" />
+            <input asp-for="OpeningHours" class="form-control" placeholder="09:00 - 22:00" />
             <span asp-validation-for="OpeningHours" class="text-danger"></span>
         </div>
 
@@ -59,4 +74,55 @@
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        (function ($) {
+            const restaurantId = @restaurantId;
+            const $dropzone = $('#attachment-dropzone');
+            const $file = $('#attachment-file');
+            const token = $('#attachment-upload-form input[name="__RequestVerificationToken"]').val();
+
+            function loadAttachments() {
+                $('#attachment-list').load('/restorani/attachments/' + restaurantId);
+            }
+
+            function upload(file) {
+                if (!file) return;
+                const data = new FormData();
+                data.append('file', file);
+                $('#attachment-status').text('Upload u tijeku...');
+                $.ajax({
+                    url: '/restorani/attachments/upload/' + restaurantId,
+                    method: 'POST',
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    headers: { 'RequestVerificationToken': token }
+                }).done(function () {
+                    $('#attachment-status').text('Datoteka je spremljena.');
+                    loadAttachments();
+                }).fail(function (xhr) {
+                    $('#attachment-status').text(xhr.responseText || 'Upload nije uspio.');
+                });
+            }
+
+            $dropzone.on('dragover', function (event) {
+                event.preventDefault();
+                $dropzone.addClass('drag-over');
+            }).on('dragleave drop', function (event) {
+                event.preventDefault();
+                $dropzone.removeClass('drag-over');
+                if (event.type === 'drop') upload(event.originalEvent.dataTransfer.files[0]);
+            });
+            $file.on('change', function () { upload(this.files[0]); });
+            $(document).on('click', '.delete-attachment', function () {
+                if (!confirm('Obrisati ovu datoteku?')) return;
+                $.ajax({
+                    url: '/restorani/attachments/delete/' + $(this).data('id'),
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': token }
+                }).done(loadAttachments);
+            });
+            loadAttachments();
+        })(jQuery);
+    </script>
 }

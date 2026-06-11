@@ -5,10 +5,10 @@ namespace FoodOrderingLab2.ViewModels
 {
     public class RestaurantMenuItemCreateModel
     {
-        [Required]
+        [Required, StringLength(150)]
         public string Name { get; set; } = null!;
 
-        [Required]
+        [Required, StringLength(1000)]
         public string Description { get; set; } = null!;
 
         [Range(0.01, 9999.99)]

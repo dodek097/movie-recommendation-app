@@ -7,12 +7,13 @@
     var orderId = ViewBag.OrderId as int?;
 }
 
-<div class="page-header">
+<div class="page-header page-header-center">
     <h1>Uredi narudžbu #@orderId</h1>
 </div>
 
 <div class="form-container">
     <form method="post" class="order-form">
+        @Html.AntiForgeryToken()
         <input type="hidden" name="OrderId" value="@orderId" />
 
         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
@@ -23,6 +24,8 @@
                 ViewData["name"] = "CustomerId";
                 ViewData["id"] = "customer-autocomplete";
                 ViewData["apiUrl"] = "/kupci/search";
+                ViewData["placeholder"] = "Odaberi kupca";
+                ViewData["required"] = true;
                 ViewData["selectedId"] = Model.CustomerId.ToString();
                 ViewData["selectedText"] = customer?.FullName ?? "Nepoznat kupac";
             }
@@ -36,6 +39,8 @@
                 ViewData["name"] = "RestaurantId";
                 ViewData["id"] = "restaurant-autocomplete";
                 ViewData["apiUrl"] = "/restorani/search";
+                ViewData["placeholder"] = "Odaberi restoran";
+                ViewData["required"] = true;
                 ViewData["selectedId"] = Model.RestaurantId.ToString();
                 ViewData["selectedText"] = restaurant?.Name ?? "Nepoznat restoran";
             }
@@ -47,7 +52,7 @@
             <label for="order-date">Datum narudžbe</label>
             @{
                 ViewData["name"] = "OrderDate";
-                ViewData["value"] = Model.OrderDate.ToString("d.M.yyyy H:mm");
+                ViewData["date"] = Model.OrderDate;
             }
             <partial name="_DateTimePartial" />
             <span asp-validation-for="OrderDate" class="text-danger"></span>
@@ -86,17 +91,17 @@
                             </select>
                         </td>
                         <td data-label="Količina"><input type="number" min="1" value="@Model.Items[i].Quantity" class="form-control" name="Items[@i].Quantity" /></td>
-                        <td data-label="Napomena"><input type="text" class="form-control" value="@Model.Items[i].SpecialRequests" name="Items[@i].SpecialRequests" /></td>
+                        <td data-label="Napomena"><input type="text" class="form-control" value="@Model.Items[i].SpecialRequests" name="Items[@i].SpecialRequests" maxlength="500" /></td>
                         <td data-label="Akcija"><button type="button" class="btn btn-danger btn-small remove-item">Ukloni</button></td>
                     </tr>
                 }
 
                 <tr class="order-item-row" style="display:none;">
                     <td data-label="Artikl">
-                        <select class="form-control autocomplete-select item-menu" data-api="/meni/search" data-placeholder="Odaberi artikl" name="Items[__index__].MenuItemId" style="width:100%"></select>
+                        <select class="form-control autocomplete-select item-menu" data-api="/meni/search" data-placeholder="Odaberi artikl" data-skip-autocomplete="true" name="Items[__index__].MenuItemId" style="width:100%"><option value=""></option></select>
                     </td>
                     <td data-label="Količina"><input type="number" min="1" value="1" class="form-control" name="Items[__index__].Quantity" /></td>
-                    <td data-label="Napomena"><input type="text" class="form-control" name="Items[__index__].SpecialRequests" /></td>
+                    <td data-label="Napomena"><input type="text" class="form-control" name="Items[__index__].SpecialRequests" maxlength="500" /></td>
                     <td data-label="Akcija"><button type="button" class="btn btn-danger btn-small remove-item">Ukloni</button></td>
                 </tr>
             </tbody>
@@ -111,6 +116,7 @@
 
     <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #444;">
         <form method="post" action="@Url.Action("Delete", new { id = orderId })" style="display:inline;">
+            @Html.AntiForgeryToken()
             <button type="submit" class="btn btn-danger" onclick="return confirm('Jeste sigurni da želite obrisati ovu narudžbu?');">Obriši narudžbu</button>
         </form>
     </div>
@@ -122,6 +128,9 @@
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script>
+        function getRestaurantId(){
+            return $('#restaurant-autocomplete').val() || '@Model.RestaurantId';
+        }
         (function($){
             $(function(){
                 var idx = @Model.Items.Count;
@@ -131,7 +140,22 @@
                 }
 
                 function initMenuItemSelect($s){
+
+                    if ($s.hasClass('select2-hidden-accessible')) {
+                        $s.select2('destroy');
+                    }
+
                     var placeholder = $s.data('placeholder') || 'Odaberi artikl';
+
+                    var existingValue = $s.val();
+                    var existingText = $s.find('option').first().text();
+
+                    if ($s.find('option[value=""]').length === 0) {
+                        $s.prepend('<option value=""></option>');
+                    }
+
+                    $s.prop('disabled', false);
+
                     $s.select2({
                         ajax: {
                             url: $s.data('api'),
@@ -140,10 +164,15 @@
                             data: function(params){
                                 return {
                                     q: params.term || '',
-                                    restaurantId: getSelectedRestaurantId()
+                                    restaurantId: getRestaurantId()
                                 };
                             },
-                            processResults: function(d){ return { results: d }; }
+                            processResults: d => ({
+                                results: d.map(x => ({
+                                    id: x.id,
+                                    text: x.text || x.name
+                                }))
+                            })
                         },
                         dropdownParent: $('body'),
                         minimumInputLength: 0,
@@ -151,6 +180,19 @@
                         placeholder: placeholder,
                         allowClear: true
                     });
+
+                    $s.on('select2:select', function(e){
+                        var data = e.params && e.params.data;
+                        if (data && data.id) {
+                            var option = new Option(data.text, data.id, true, true);
+                            $s.append(option).trigger('change.select2');
+                        }
+                    });
+
+                    if (existingValue) {
+                        var option = new Option(existingText, existingValue, true, true);
+                        $s.append(option).trigger('change.select2');
+                    }
                 }
 
                 function updateItemControls(){
@@ -190,6 +232,15 @@
                     });
                 }
 
+                function reindexRows(){
+                    $('#order-items tbody tr').not('.order-item-row').each(function(index){
+                        $(this).find('select[name$=".MenuItemId"]').attr('name', 'Items[' + index + '].MenuItemId');
+                        $(this).find('input[name$=".Quantity"]').attr('name', 'Items[' + index + '].Quantity');
+                        $(this).find('input[name$=".SpecialRequests"]').attr('name', 'Items[' + index + '].SpecialRequests');
+                    });
+                    idx = $('#order-items tbody tr').not('.order-item-row').length;
+                }
+
                 function animateRowIn($row){
                     $row.addClass('new-row');
                     requestAnimationFrame(function(){
@@ -201,11 +252,14 @@
                     $row.addClass('removing');
                     window.setTimeout(function(){
                         $row.remove();
+                        reindexRows();
                     }, 240);
                 }
 
                 function addRow(){
                     var $template = $('.order-item-row').clone().removeClass('order-item-row').show();
+                    $template.find('.select2-container').remove();
+                    $template.find('select').removeClass('select2-hidden-accessible').removeAttr('data-select2-id aria-hidden tabindex');
                     var html = $template.html().replace(/__index__/g, idx);
                     var $tr = $('<tr></tr>').html(html).addClass('new-row');
                     $('#order-items tbody').append($tr);
@@ -220,13 +274,11 @@
                 }
 
                 // initialize existing selects
-                $('#order-items .autocomplete-select').each(function(){
+                $('#order-items tbody tr:not(.order-item-row) .autocomplete-select').each(function(){
                     var $s = $(this);
-                    if ($s.find('option').length) {
-                        $s.select2({ dropdownParent: $('body'), minimumInputLength:0, width:'100%', placeholder: $s.data('placeholder') || 'Odaberi artikl', allowClear:true });
-                    } else {
+                    setTimeout(function(){
                         initMenuItemSelect($s);
-                    }
+                    }, 0);
                 });
 
                 // bind validation for rows already on the page
@@ -236,6 +288,7 @@
 
                 $('#restaurant-autocomplete').on('change', function(){
                     $('#order-items tbody tr').not('.order-item-row').remove();
+                    reindexRows();
                     addRow();
                     updateItemControls();
                 });
@@ -262,7 +315,8 @@
                         var menu = $(this).find('select[name$=".MenuItemId"]').val();
                         var qty = parseInt($(this).find('input[name$=".Quantity"]').val() || '0');
                         if (!menu || menu === '' || qty <= 0) {
-                        validateOrderRow($(this));
+                            validateOrderRow($(this));
+                            valid = false;
                             return false;
                         }
                     });

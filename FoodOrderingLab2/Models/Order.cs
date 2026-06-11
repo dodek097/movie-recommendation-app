@@ -7,7 +7,6 @@ namespace FoodOrderingLab2.Models
     public class Order
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int OrderId { get; set; }
 
         [Required(ErrorMessage = "Kupac je obavezan.")]

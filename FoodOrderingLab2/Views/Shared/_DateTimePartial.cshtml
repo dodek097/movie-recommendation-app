@@ -1,6 +1,15 @@
+@using System.Globalization
 @{
     var name = ViewData["name"] as string ?? "Date";
-    var value = ViewData["value"] as string ?? "";
+    var date = ViewData["date"] is DateTime dateValue ? dateValue : DateTime.Now;
+    var isCroatian = CultureInfo.CurrentCulture.Name.StartsWith("hr", StringComparison.OrdinalIgnoreCase);
+    var value = date.ToString(isCroatian ? "d.M.yyyy H:mm" : "M/d/yyyy h:mm tt", CultureInfo.CurrentCulture);
+    var dateFormat = isCroatian ? "d.m.Y H:i" : "m/d/Y h:i K";
 }
 
-<input type="text" class="form-control datetime-picker" name="@name" value="@value" />
+<input type="text"
+       class="form-control datetime-picker"
+       name="@name"
+       value="@value"
+       data-date-format="@dateFormat"
+       data-time-24hr="@isCroatian.ToString().ToLowerInvariant()" />

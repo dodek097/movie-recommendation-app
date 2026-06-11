@@ -1,0 +1,49 @@
+@page
+@model FoodOrderingLab2.Areas.Identity.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Prijava";
+}
+
+<div class="form-container identity-form">
+    <div class="form-heading">
+        <span class="detail-subtitle">Dobrodošli natrag</span>
+        <h1>Prijava</h1>
+        <p>Prijavi se za pregled i stvaranje svojih narudžbi.</p>
+    </div>
+
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="form-group">
+            <label asp-for="Input.Email"></label>
+            <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="ime@primjer.hr" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Input.Password"></label>
+            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+        <label class="checkbox-label">
+            <input asp-for="Input.RememberMe" />
+            <span>Zapamti me na ovom uređaju</span>
+        </label>
+        <button type="submit" class="btn btn-primary btn-block">Prijavi se</button>
+    </form>
+
+    @if (Model.ExternalLogins.Count > 0)
+    {
+        <div class="identity-divider"><span>ili</span></div>
+        <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            @foreach (var provider in Model.ExternalLogins)
+            {
+                <button type="submit" class="btn btn-outline btn-block" name="provider" value="@provider.Name">
+                    Prijava preko @provider.DisplayName
+                </button>
+            }
+        </form>
+    }
+
+    <p class="identity-footer">Nemaš račun? <a asp-page="./Register">Registriraj se</a></p>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

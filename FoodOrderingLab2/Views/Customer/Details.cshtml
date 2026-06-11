@@ -21,7 +21,7 @@
 
         <div class="detail-section">
             <h2>Orders</h2>
-            @if (Model?.Orders?.Count > 0)
+            @if (Model.Orders.Count > 0)
             {
                 <ul class="detail-list">
                     @foreach (var order in Model.Orders)
@@ -48,10 +48,13 @@
         <div class="detail-action">
             <a class="btn btn-secondary" asp-controller="Customer" asp-action="Index">Back to customers</a>
             <a class="btn btn-outline" asp-controller="Customer" asp-action="Edit" asp-route-id="@Model.CustomerId">Edit</a>
-            <form asp-controller="Customer" asp-action="Delete" asp-route-id="@Model.CustomerId" method="post" style="display:inline;">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-danger" onclick="return confirm('Jeste li sigurni da želite obrisati ovog kupca?');">Delete</button>
-            </form>
+            @if (User.IsInRole("Admin"))
+            {
+                <form asp-controller="Customer" asp-action="Delete" asp-route-id="@Model.CustomerId" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Jeste li sigurni da želite obrisati ovog kupca?');">Delete</button>
+                </form>
+            }
         </div>
     </div>
 </section>

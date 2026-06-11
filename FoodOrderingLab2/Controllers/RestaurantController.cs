@@ -1,23 +1,36 @@
 using Microsoft.AspNetCore.Mvc;
 using FoodOrderingLab2.Repositories;
 using FoodOrderingLab2.ViewModels;
+using FoodOrderingLab2.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace FoodOrderingLab2.Controllers
 {
     [Route("restorani")]
+    [Authorize]
     public class RestaurantController : Controller
     {
         private readonly RestaurantRepository _restaurantRepository;
         private readonly MenuItemRepository _menuItemRepository;
+        private readonly ApplicationDbContext _dbContext;
+        private readonly IWebHostEnvironment _environment;
 
-        public RestaurantController(RestaurantRepository restaurantRepository, MenuItemRepository menuItemRepository)
+        public RestaurantController(
+            RestaurantRepository restaurantRepository,
+            MenuItemRepository menuItemRepository,
+            ApplicationDbContext dbContext,
+            IWebHostEnvironment environment)
         {
             _restaurantRepository = restaurantRepository;
             _menuItemRepository = menuItemRepository;
+            _dbContext = dbContext;
+            _environment = environment;
         }
 
         [Route("")]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var restaurants = _restaurantRepository.GetAll();
@@ -26,6 +39,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpGet]
         [Route("create")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var model = new RestaurantCreateViewModel();
@@ -35,9 +49,16 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpPost]
         [Route("create")]
+        [Authorize(Roles = "Admin,Manager")]
         [ValidateAntiForgeryToken]
         public IActionResult Create(RestaurantCreateViewModel model)
         {
+            model.MenuItems ??= [];
+            if (!model.MenuItems.Any(mi => !string.IsNullOrWhiteSpace(mi.Name)))
+            {
+                ModelState.AddModelError(nameof(model.MenuItems), "Dodaj barem jedno jelo restoranu.");
+            }
+
             if (!ModelState.IsValid)
             {
                 if (!model.MenuItems.Any())
@@ -49,7 +70,6 @@ namespace FoodOrderingLab2.Controllers
 
             var restaurant = new Models.Restaurant
             {
-                RestaurantId = _restaurantRepository.GetNextId(),
                 Name = model.Name,
                 Address = model.Address,
                 Phone = model.Phone,
@@ -58,19 +78,17 @@ namespace FoodOrderingLab2.Controllers
                 OpeningHours = model.OpeningHours
             };
 
-            var nextMenuItemId = _menuItemRepository.GetNextId();
             var validMenuItems = model.MenuItems
                 .Where(mi => !string.IsNullOrWhiteSpace(mi.Name))
                 .Select(mi => new Models.MenuItem
                 {
-                    MenuItemId = nextMenuItemId++,
                     Name = mi.Name,
                     Description = mi.Description,
                     Price = mi.Price,
                     Category = mi.Category,
                     Calories = mi.Calories,
                     IsAvailable = mi.IsAvailable,
-                    RestaurantId = restaurant.RestaurantId
+                    Restaurant = restaurant
                 })
                 .ToList();
 
@@ -85,6 +103,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpGet]
         [Route("edit/{id:int}")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Edit(int id)
         {
             var restaurant = _restaurantRepository.GetById(id);
@@ -109,6 +128,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpPost]
         [Route("edit/{id:int}")]
+        [Authorize(Roles = "Admin,Manager")]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, RestaurantCreateViewModel model)
         {
@@ -137,6 +157,7 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpPost]
         [Route("delete/{id:int}")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
@@ -152,7 +173,16 @@ namespace FoodOrderingLab2.Controllers
                 return RedirectToAction("Details", new { id });
             }
 
-            _restaurantRepository.Delete(restaurant);
+            try
+            {
+                _restaurantRepository.Delete(restaurant);
+                TempData["SuccessMessage"] = "Restoran obrisan.";
+            }
+            catch (System.Exception ex)
+            {
+                TempData["ErrorMessage"] = "Ne mogu obrisati restoran: " + ex.Message;
+            }
+
             return RedirectToAction("Index");
         }
 
@@ -177,17 +207,88 @@ namespace FoodOrderingLab2.Controllers
 
         [HttpGet]
         [Route("search")]
+        [AllowAnonymous]
         public IActionResult Search(string q)
         {
             q = q ?? string.Empty;
             var results = _restaurantRepository.GetAll()
                 .Where(r => r.Name.Contains(q, System.StringComparison.InvariantCultureIgnoreCase)
                             || r.Address.Contains(q, System.StringComparison.InvariantCultureIgnoreCase))
-                .Select(r => new { id = r.RestaurantId, text = r.Name, name = r.Name, address = r.Address, rating = r.Rating })
+                .Select(r => new { id = r.RestaurantId, text = r.Name, name = r.Name, address = r.Address, rating = r.Rating.ToString("F2") })
                 .Take(10)
                 .ToList();
 
             return Json(results);
+        }
+
+        [Authorize(Roles = "Admin,Manager")]
+        [HttpPost("attachments/upload/{restaurantId:int}")]
+        [ValidateAntiForgeryToken]
+        [RequestSizeLimit(10_000_000)]
+        public async Task<IActionResult> UploadAttachment(int restaurantId, IFormFile file)
+        {
+            if (!await _dbContext.Restaurants.AnyAsync(x => x.RestaurantId == restaurantId)) return NotFound();
+            if (file == null || file.Length == 0) return BadRequest("Datoteka je prazna.");
+            if (file.Length > 10_000_000) return BadRequest("Datoteka smije imati najviše 10 MB.");
+
+            var allowedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".webp", ".pdf" };
+            var extension = Path.GetExtension(file.FileName);
+            if (!allowedExtensions.Contains(extension)) return BadRequest("Dopušteni formati su JPG, PNG, WEBP i PDF.");
+
+            var relativeDirectory = Path.Combine("uploads", "restaurants", restaurantId.ToString());
+            var physicalDirectory = Path.Combine(_environment.WebRootPath, relativeDirectory);
+            Directory.CreateDirectory(physicalDirectory);
+            var storedFileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
+            var physicalPath = Path.Combine(physicalDirectory, storedFileName);
+
+            await using (var stream = System.IO.File.Create(physicalPath))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var attachment = new Models.RestaurantAttachment
+            {
+                RestaurantId = restaurantId,
+                FileName = Path.GetFileName(file.FileName),
+                FilePath = "/" + Path.Combine(relativeDirectory, storedFileName).Replace('\\', '/'),
+                ContentType = file.ContentType,
+                FileSize = file.Length,
+                CreatedAt = DateTime.UtcNow
+            };
+            _dbContext.RestaurantAttachments.Add(attachment);
+            await _dbContext.SaveChangesAsync();
+            return Json(new { success = true, id = attachment.RestaurantAttachmentId });
+        }
+
+        [Authorize(Roles = "Admin,Manager")]
+        [HttpGet("attachments/{restaurantId:int}")]
+        public async Task<IActionResult> GetAttachments(int restaurantId)
+        {
+            var attachments = await _dbContext.RestaurantAttachments.AsNoTracking()
+                .Where(x => x.RestaurantId == restaurantId)
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
+            return PartialView("_AttachmentList", attachments);
+        }
+
+        [Authorize(Roles = "Admin,Manager")]
+        [HttpPost("attachments/delete/{id:int}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAttachment(int id)
+        {
+            var attachment = await _dbContext.RestaurantAttachments.FindAsync(id);
+            if (attachment == null) return NotFound();
+
+            var physicalPath = Path.GetFullPath(Path.Combine(_environment.WebRootPath, attachment.FilePath.TrimStart('/')));
+            var uploadsRoot = Path.GetFullPath(Path.Combine(_environment.WebRootPath, "uploads", "restaurants"));
+            if (physicalPath.StartsWith(uploadsRoot, StringComparison.OrdinalIgnoreCase) && System.IO.File.Exists(physicalPath))
+            {
+                System.IO.File.Delete(physicalPath);
+            }
+
+            _dbContext.RestaurantAttachments.Remove(attachment);
+            await _dbContext.SaveChangesAsync();
+            return Json(new { success = true });
         }
     }
 }

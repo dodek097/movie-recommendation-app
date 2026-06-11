@@ -28,9 +28,11 @@ namespace FoodOrderingLab2.Repositories
                 .FirstOrDefault(c => c.CustomerId == id);
         }
 
-        public int GetNextId()
+        public Customer? GetByAppUserId(string appUserId)
         {
-            return _context.Customers.Any() ? _context.Customers.Max(c => c.CustomerId) + 1 : 1;
+            return _context.Customers
+                .Include(c => c.Orders)
+                .FirstOrDefault(c => c.AppUserId == appUserId);
         }
 
         public void Add(Customer customer)

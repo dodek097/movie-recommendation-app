@@ -3,7 +3,10 @@
 <div class="page-header page-header-center">
     <h1>Menu Items</h1>
     <div class="header-actions">
-        <a asp-controller="MenuItem" asp-action="Create" class="btn btn-primary btn-large">+ Dodaj stavku</a>
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <a asp-controller="MenuItem" asp-action="Create" class="btn btn-primary btn-large">+ Dodaj stavku</a>
+        }
     </div>
     <div class="search-row">
         <input type="search" class="search-input" placeholder="Search menu items..." data-search-api="/meni/search" data-search-template="menuitem" data-search-target="#menuitem-results" autocomplete="off" />
@@ -15,24 +18,28 @@
 }
 <div class="search-grid" id="menuitem-results">
 @foreach (var item in Model) {
-    <div class="card">
+    <div class="card entity-card">
         <div class="card-header">
+            <span class="card-kicker">@item.Category</span>
             <h3 class="card-title">@item.Name</h3>
         </div>
         <div class="card-body">
-            <p class="card-description"><strong>Category:</strong> @item.Category</p>
-            <p class="card-description"><strong>Price:</strong> @item.Price.ToString("F2") EUR</p>
-        </div>
-        <div class="card-body">
-            <p class="card-description"><strong>Restaurant:</strong> @item.Restaurant?.Name</p>
+            <div class="card-stat-row"><span>Price</span><strong>@item.Price.ToString("F2") EUR</strong></div>
+            <div class="card-stat-row"><span>Restaurant</span><strong>@item.Restaurant?.Name</strong></div>
         </div>
         <div class="card-footer">
-            <a asp-controller="MenuItem" asp-action="Details" asp-route-id="@item.MenuItemId" class="btn btn-secondary">Details</a>
-            <a asp-controller="MenuItem" asp-action="Edit" asp-route-id="@item.MenuItemId" class="btn btn-secondary">Edit</a>
-            <form asp-controller="MenuItem" asp-action="Delete" asp-route-id="@item.MenuItemId" method="post" class="d-inline-block" onsubmit="return confirm('Jeste li sigurni da želite obrisati stavku menija?');">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
+            <a asp-controller="MenuItem" asp-action="Details" asp-route-id="@item.MenuItemId" class="btn btn-secondary">View</a>
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                <a asp-controller="MenuItem" asp-action="Edit" asp-route-id="@item.MenuItemId" class="btn btn-outline">Edit</a>
+            }
+            @if (User.IsInRole("Admin"))
+            {
+                <form asp-controller="MenuItem" asp-action="Delete" asp-route-id="@item.MenuItemId" method="post" class="d-inline-block" onsubmit="return confirm('Jeste li sigurni da želite obrisati stavku menija?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            }
         </div>
     </div>
 }
