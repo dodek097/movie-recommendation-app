@@ -51,7 +51,7 @@ Autorizacija:
 ## Upload i autentikacija
 
 - Restoran ima privitke spremljene na disk i metapodatke u bazi.
-- Edit restorana sadrži asinkroni HTML5 drag-and-drop upload.
+- Edit restorana koristi Dropzone.js za asinkroni drag-and-drop upload.
 - Popis i brisanje datoteka rade AJAX pozivima.
 - Upload validira veličinu i ekstenziju te koristi anti-forgery zaštitu.
 - ASP.NET Core Identity podržava lokalnu registraciju/prijavu i role.

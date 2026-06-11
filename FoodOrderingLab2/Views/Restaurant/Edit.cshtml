@@ -11,13 +11,15 @@
 <section class="form-container attachment-section">
     <h2>Datoteke restorana</h2>
     <p class="color-text-light">Dodaj sliku, PDF jelovnik ili dokument. Maksimalna veličina je 10 MB.</p>
-    <form id="attachment-upload-form" enctype="multipart/form-data">
+    <form id="attachmentDz"
+          action="@Url.Action("UploadAttachment", "Restaurant", new { restaurantId })"
+          class="dropzone attachment-dropzone"
+          enctype="multipart/form-data">
         @Html.AntiForgeryToken()
-        <label id="attachment-dropzone" class="attachment-dropzone" for="attachment-file">
+        <div class="dz-message" data-dz-message>
             <strong>Povuci datoteku ovdje</strong>
             <span>ili klikni za odabir</span>
-            <input id="attachment-file" name="file" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" hidden />
-        </label>
+        </div>
     </form>
     <div id="attachment-status" class="color-text-light"></div>
     <div id="attachment-list"></div>
@@ -72,55 +74,58 @@
 </div>
 
 @section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dropzone@5.9.3/dist/min/dropzone.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/dropzone@5.9.3/dist/min/dropzone.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script>
         (function ($) {
             const restaurantId = @restaurantId;
-            const $dropzone = $('#attachment-dropzone');
-            const $file = $('#attachment-file');
-            const token = $('#attachment-upload-form input[name="__RequestVerificationToken"]').val();
+            const token = $('#attachmentDz input[name="__RequestVerificationToken"]').val();
 
             function loadAttachments() {
                 $('#attachment-list').load('/restorani/attachments/' + restaurantId);
             }
 
-            function upload(file) {
-                if (!file) return;
-                const data = new FormData();
-                data.append('file', file);
-                $('#attachment-status').text('Upload u tijeku...');
-                $.ajax({
-                    url: '/restorani/attachments/upload/' + restaurantId,
-                    method: 'POST',
-                    data: data,
-                    processData: false,
-                    contentType: false,
-                    headers: { 'RequestVerificationToken': token }
-                }).done(function () {
-                    $('#attachment-status').text('Datoteka je spremljena.');
-                    loadAttachments();
-                }).fail(function (xhr) {
-                    $('#attachment-status').text(xhr.responseText || 'Upload nije uspio.');
-                });
-            }
-
-            $dropzone.on('dragover', function (event) {
-                event.preventDefault();
-                $dropzone.addClass('drag-over');
-            }).on('dragleave drop', function (event) {
-                event.preventDefault();
-                $dropzone.removeClass('drag-over');
-                if (event.type === 'drop') upload(event.originalEvent.dataTransfer.files[0]);
+            Dropzone.autoDiscover = false;
+            const attachmentDropzone = new Dropzone('#attachmentDz', {
+                paramName: 'file',
+                maxFilesize: 10,
+                acceptedFiles: '.jpg,.jpeg,.png,.webp,.pdf',
+                maxFiles: 1,
+                headers: { 'RequestVerificationToken': token },
+                init: function () {
+                    this.on('processing', function () {
+                        $('#attachment-status').text('Upload u tijeku...');
+                    });
+                    this.on('success', function (file) {
+                        this.removeFile(file);
+                        $('#attachment-status').text('Datoteka je spremljena.');
+                        loadAttachments();
+                    });
+                    this.on('error', function (file, response) {
+                        const message = typeof response === 'string'
+                            ? response
+                            : response?.message || 'Upload nije uspio.';
+                        $('#attachment-status').text(message);
+                        this.removeFile(file);
+                    });
+                    this.on('complete', function () {
+                        if (this.files.length > 1) this.removeFile(this.files[0]);
+                    });
+                }
             });
-            $file.on('change', function () { upload(this.files[0]); });
+
             $(document).on('click', '.delete-attachment', function () {
                 if (!confirm('Obrisati ovu datoteku?')) return;
                 $.ajax({
                     url: '/restorani/attachments/delete/' + $(this).data('id'),
                     method: 'POST',
                     headers: { 'RequestVerificationToken': token }
-                }).done(loadAttachments);
+                }).done(function () {
+                    $('#attachment-status').text('Datoteka je obrisana.');
+                    loadAttachments();
+                });
             });
             loadAttachments();
         })(jQuery);

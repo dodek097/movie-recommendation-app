@@ -187,6 +187,8 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         using var client = factory.CreateAdminClient();
 
         var editPage = await client.GetStringAsync($"/restorani/edit/{seed.RestaurantId}");
+        Assert.Contains("dropzone@5.9.3", editPage);
+        Assert.Contains("new Dropzone('#attachmentDz'", editPage);
         var token = Regex.Match(editPage, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"([^\"]+)\"")
             .Groups[1].Value;
         Assert.NotEmpty(token);

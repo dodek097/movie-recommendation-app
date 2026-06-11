@@ -1511,21 +1511,41 @@ textarea {
 }
 
 .attachment-dropzone {
-    display: grid;
-    place-items: center;
-    gap: 0.5rem;
     min-height: 150px;
     margin: 1rem 0;
     padding: 2rem;
     border: 2px dashed var(--color-accent);
     border-radius: var(--border-radius);
+    background: rgba(255, 107, 53, 0.04);
+    color: var(--color-text);
     cursor: pointer;
     transition: background-color 180ms ease, transform 180ms ease;
 }
 
-.attachment-dropzone.drag-over {
+.attachment-dropzone.dz-drag-hover {
     background-color: rgba(255, 107, 53, 0.14);
     transform: scale(1.01);
+}
+
+.attachment-dropzone .dz-message {
+    display: grid;
+    place-items: center;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+}
+
+.attachment-dropzone .dz-message strong {
+    color: var(--color-accent);
+    font-size: 1.05rem;
+}
+
+.attachment-dropzone .dz-preview {
+    margin: 0.75rem;
+}
+
+.attachment-dropzone .dz-preview .dz-image {
+    border: 1px solid rgba(255, 107, 53, 0.25);
+    background: var(--color-surface);
 }
 
 .public-attachment-grid {
