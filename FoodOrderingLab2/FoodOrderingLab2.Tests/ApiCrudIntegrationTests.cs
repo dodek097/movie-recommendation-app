@@ -16,6 +16,7 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
     public async Task CustomersApi_CoversCrudValidationAndMissingIds()
     {
         await factory.ResetAsync();
+        var seed = await ApiTestData.SeedAsync(factory);
         using var client = factory.CreateAdminClient();
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/customers?q=test")).StatusCode);
 
@@ -33,8 +34,11 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         request.LastName = "Promijenjeno";
         Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync($"/api/customers/{created.CustomerId}", request)).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/customers", new CustomerRequest())).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PutAsJsonAsync($"/api/customers/{created.CustomerId}", new CustomerRequest())).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/customers/999999")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.PutAsJsonAsync("/api/customers/999999", request)).StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, (await client.DeleteAsync($"/api/customers/{seed.CustomerId}")).StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync($"/api/customers/{created.CustomerId}")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync($"/api/customers/{created.CustomerId}")).StatusCode);
     }
@@ -43,6 +47,7 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
     public async Task RestaurantsApi_CoversCrudValidationAndMissingIds()
     {
         await factory.ResetAsync();
+        var seed = await ApiTestData.SeedAsync(factory);
         using var client = factory.CreateAdminClient();
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/restaurants?minRating=4")).StatusCode);
         var request = new RestaurantRequest
@@ -58,8 +63,11 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         request.Rating = 4.8m;
         Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync($"/api/restaurants/{created.RestaurantId}", request)).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/restaurants", new RestaurantRequest())).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PutAsJsonAsync($"/api/restaurants/{created.RestaurantId}", new RestaurantRequest())).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/restaurants/999999")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.PutAsJsonAsync("/api/restaurants/999999", request)).StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, (await client.DeleteAsync($"/api/restaurants/{seed.RestaurantId}")).StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync($"/api/restaurants/{created.RestaurantId}")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync($"/api/restaurants/{created.RestaurantId}")).StatusCode);
     }
@@ -85,9 +93,12 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync($"/api/menu-items/{created.MenuItemId}", request)).StatusCode);
         request.RestaurantId = 999999;
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/menu-items", request)).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PutAsJsonAsync($"/api/menu-items/{created.MenuItemId}", request)).StatusCode);
         request.RestaurantId = seed.RestaurantId;
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/menu-items/999999")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.PutAsJsonAsync("/api/menu-items/999999", request)).StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, (await client.DeleteAsync($"/api/menu-items/{seed.MenuItemId}")).StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync($"/api/menu-items/{created.MenuItemId}")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync($"/api/menu-items/{created.MenuItemId}")).StatusCode);
     }
@@ -113,6 +124,8 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync($"/api/orders/{created.OrderId}", request)).StatusCode);
         var invalid = new OrderRequest { CustomerId = seed.CustomerId, RestaurantId = seed.RestaurantId, OrderDate = DateTime.UtcNow, Items = [] };
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/orders", invalid)).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PutAsJsonAsync($"/api/orders/{created.OrderId}", invalid)).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/orders/999999")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.PutAsJsonAsync("/api/orders/999999", request)).StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync($"/api/orders/{created.OrderId}")).StatusCode);
@@ -127,6 +140,7 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         using var client = factory.CreateAdminClient();
         Assert.Equal(HttpStatusCode.OK,
             (await client.GetAsync($"/api/orders/{seed.OrderId}/items?q=bez&menuItemId={seed.MenuItemId}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/orders/999999/items")).StatusCode);
         var request = new OrderItemRequest { MenuItemId = seed.SecondMenuItemId, Quantity = 2, SpecialRequests = "Bez umaka" };
         var create = await client.PostAsJsonAsync($"/api/orders/{seed.OrderId}/items", request);
         Assert.Equal(HttpStatusCode.Created, create.StatusCode);
@@ -136,10 +150,15 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         request.Quantity = 3;
         Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync($"/api/orders/{seed.OrderId}/items/{created.OrderItemId}", request)).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync($"/api/orders/{seed.OrderId}/items", new OrderItemRequest())).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.PostAsJsonAsync("/api/orders/999999/items", request)).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PutAsJsonAsync($"/api/orders/{seed.OrderId}/items/{created.OrderItemId}", new OrderItemRequest())).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/api/orders/{seed.OrderId}/items/999999")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.PutAsJsonAsync($"/api/orders/{seed.OrderId}/items/999999", request)).StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync($"/api/orders/{seed.OrderId}/items/{created.OrderItemId}")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync($"/api/orders/{seed.OrderId}/items/{created.OrderItemId}")).StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, (await client.DeleteAsync($"/api/orders/{seed.OrderId}/items/{seed.OrderItemId}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync("/api/orders/999999/items/999999")).StatusCode);
     }
 
     [Fact]
@@ -171,6 +190,9 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         using var invalidContent = CreateFileContent(seed.RestaurantId, "skripta.exe", "invalid");
         Assert.Equal(HttpStatusCode.BadRequest,
             (await client.PostAsync("/api/restaurant-attachments", invalidContent)).StatusCode);
+        using var missingRestaurantContent = CreateFileContent(999999, "menu.pdf", "valid");
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PostAsync("/api/restaurant-attachments", missingRestaurantContent)).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/restaurant-attachments/999999")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound,
             (await client.PutAsJsonAsync("/api/restaurant-attachments/999999", update)).StatusCode);
