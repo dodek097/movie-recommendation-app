@@ -1,42 +1,74 @@
 @model FoodOrderingLab2.Models.Customer
 @{ ViewData["Title"] = Model.FullName; }
+
 <section class="detail-page">
-    <div class="card detail-card">
-        <div class="detail-card-header">
+    <div class="detail-card detail-surface">
+        <div class="detail-hero">
             <div>
-                <span class="detail-subtitle">Customer profile</span>
+                <span class="detail-eyebrow">Customer profile</span>
                 <h1>@Model.FullName</h1>
+                <p class="detail-lead">@Model.Address</p>
             </div>
-            <div class="detail-meta">
-                <span>Email: <strong>@Model.Email</strong></span>
-                <span>Phone: <strong>@Model.Phone</strong></span>
+            <div class="price-panel">
+                <span>Customer since</span>
+                <strong>@Model.RegisterDate.ToString("MMM yyyy")</strong>
+                <small>@Model.Orders.Count total orders</small>
+            </div>
+        </div>
+
+        <div class="contact-grid detail-section">
+            <div class="contact-card">
+                <span>Email</span>
+                <strong><a href="mailto:@Model.Email">@Model.Email</a></strong>
+            </div>
+            <div class="contact-card">
+                <span>Phone</span>
+                <strong><a href="tel:@Model.Phone">@Model.Phone</a></strong>
+            </div>
+            <div class="contact-card">
+                <span>Address</span>
+                <strong>@Model.Address</strong>
+            </div>
+            <div class="contact-card">
+                <span>Registered</span>
+                <strong>@Model.RegisterDate.ToString("MMM dd, yyyy")</strong>
             </div>
         </div>
 
         <div class="detail-section">
-            <h2>Contact</h2>
-            <p>@Model.Address</p>
-            <p>Member since: <strong>@Model.RegisterDate.ToString("MMM dd, yyyy")</strong></p>
-        </div>
+            <div class="section-heading">
+                <div>
+                    <span class="detail-eyebrow">Order history</span>
+                    <h2>Orders</h2>
+                </div>
+                <span class="item-count">@Model.Orders.Count orders</span>
+            </div>
 
-        <div class="detail-section">
-            <h2>Orders</h2>
             @if (Model.Orders.Count > 0)
             {
-                <ul class="detail-list">
+                <div class="order-item-list">
                     @foreach (var order in Model.Orders)
                     {
-                        <li>
-                            <strong>Order #@order.OrderId</strong> - @order.Status - @order.TotalPrice.ToString("F2")
-                            <br />
-                            <a class="btn btn-outline btn-small" asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId">View details</a>
-                        </li>
+                        <div class="order-detail-item">
+                            <div>
+                                <strong>Order #@order.OrderId</strong>
+                                <small>@order.OrderDate.ToString("MMM dd, yyyy 'at' HH:mm")</small>
+                            </div>
+                            <span class="status-badge">@order.Status</span>
+                            <div>
+                                <strong>@order.TotalPrice.ToString("F2") EUR</strong>
+                                <a class="btn btn-outline btn-small" asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId">View details</a>
+                            </div>
+                        </div>
                     }
-                </ul>
+                </div>
             }
             else
             {
-                <p>No orders yet.</p>
+                <div class="attachment-empty-state">
+                    <strong>No orders yet</strong>
+                    <p>This customer has not placed an order.</p>
+                </div>
             }
         </div>
 
@@ -45,16 +77,18 @@
             <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
         }
 
-        <div class="detail-action">
+        <div class="detail-action action-bar">
             <a class="btn btn-secondary" asp-controller="Customer" asp-action="Index">Back to customers</a>
-            <a class="btn btn-outline" asp-controller="Customer" asp-action="Edit" asp-route-id="@Model.CustomerId">Edit</a>
-            @if (User.IsInRole("Admin"))
-            {
-                <form asp-controller="Customer" asp-action="Delete" asp-route-id="@Model.CustomerId" method="post" style="display:inline;">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('Jeste li sigurni da želite obrisati ovog kupca?');">Delete</button>
-                </form>
-            }
+            <div class="action-bar-right">
+                <a class="btn btn-outline" asp-controller="Customer" asp-action="Edit" asp-route-id="@Model.CustomerId">Edit</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <form asp-controller="Customer" asp-action="Delete" asp-route-id="@Model.CustomerId" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Jeste li sigurni da želite obrisati ovog kupca?');">Delete</button>
+                    </form>
+                }
+            </div>
         </div>
     </div>
 </section>
