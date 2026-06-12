@@ -53,6 +53,10 @@ public class RegisterModel(
             {
                 ModelState.Remove(key);
             }
+            if (CustomerEmailExists(currentUser.Email ?? currentUser.UserName ?? string.Empty))
+            {
+                ModelState.AddModelError(string.Empty, "Kupac s ovim emailom već postoji.");
+            }
             if (!ModelState.IsValid) return Page();
 
             db.Customers.Add(new Customer
@@ -71,6 +75,11 @@ public class RegisterModel(
         }
 
         if (!ModelState.IsValid) return Page();
+        if (CustomerEmailExists(Input.Email))
+        {
+            ModelState.AddModelError("Input.Email", "Kupac s ovim emailom već postoji.");
+            return Page();
+        }
 
         var user = new AppUser { UserName = Input.Email, Email = Input.Email, OIB = Input.OIB, JMBG = Input.JMBG };
         var result = await userManager.CreateAsync(user, Input.Password);
@@ -105,5 +114,11 @@ public class RegisterModel(
         Input.Email = currentUser.Email ?? currentUser.UserName ?? string.Empty;
         Input.OIB = currentUser.OIB;
         Input.JMBG = currentUser.JMBG;
+    }
+
+    private bool CustomerEmailExists(string email)
+    {
+        var normalizedEmail = email.Trim().ToUpper();
+        return db.Customers.Any(x => x.Email.ToUpper() == normalizedEmail);
     }
 }

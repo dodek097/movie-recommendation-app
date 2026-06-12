@@ -47,6 +47,11 @@ namespace FoodOrderingLab2.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(CustomerCreateViewModel model)
         {
+            if (!string.IsNullOrWhiteSpace(model.Email) && _customerRepository.EmailExists(model.Email))
+            {
+                ModelState.AddModelError(nameof(model.Email), "Kupac s ovim emailom već postoji.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -97,6 +102,11 @@ namespace FoodOrderingLab2.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, CustomerCreateViewModel model)
         {
+            if (!string.IsNullOrWhiteSpace(model.Email) && _customerRepository.EmailExists(model.Email, id))
+            {
+                ModelState.AddModelError(nameof(model.Email), "Kupac s ovim emailom već postoji.");
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.CustomerId = id;

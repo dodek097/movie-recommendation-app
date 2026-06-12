@@ -33,6 +33,14 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
 
         request.LastName = "Promijenjeno";
         Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync($"/api/customers/{created.CustomerId}", request)).StatusCode);
+        var duplicate = new CustomerRequest
+        {
+            FirstName = "Dupli", LastName = "Email", Email = "test@example.com", Phone = "+385 91 999 9999",
+            Address = "Dupla 1", RegisterDate = DateTime.UtcNow
+        };
+        Assert.Equal(HttpStatusCode.Conflict, (await client.PostAsJsonAsync("/api/customers", duplicate)).StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict,
+            (await client.PutAsJsonAsync($"/api/customers/{created.CustomerId}", duplicate)).StatusCode);
         request.Phone = "2342353";
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/customers", request)).StatusCode);
         request.Phone = "+385 91 222 2222";
@@ -581,6 +589,7 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
     public async Task Forms_RenderExpectedUxAndRejectInvalidRelationships()
     {
         await factory.ResetAsync();
+        await ApiTestData.SeedAsync(factory);
         using var anonymous = factory.CreateClient();
         var login = await anonymous.GetStringAsync("/Identity/Account/Login");
         Assert.Contains("Input.RememberMe", login);
@@ -609,6 +618,23 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         Assert.Equal(HttpStatusCode.OK, invalidRestaurant.StatusCode);
         Assert.Contains("Dodaj barem jedno jelo restoranu", await invalidRestaurant.Content.ReadAsStringAsync());
 
+        var customerPage = await admin.GetStringAsync("/kupci/create");
+        var duplicateCustomer = await admin.PostAsync("/kupci/create", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["__RequestVerificationToken"] = ExtractAntiForgeryToken(customerPage),
+            ["FirstName"] = "Dupli",
+            ["LastName"] = "Kupac",
+            ["Email"] = "test@example.com",
+            ["Phone"] = "+385 91 999 9999",
+            ["Address"] = "Dupla 1",
+            ["RegisterDate"] = DateTime.UtcNow.ToString("yyyy-MM-dd")
+        }));
+        Assert.Equal(HttpStatusCode.OK, duplicateCustomer.StatusCode);
+        Assert.Contains("Kupac s ovim emailom", await duplicateCustomer.Content.ReadAsStringAsync());
+        using var duplicateScope = factory.Services.CreateScope();
+        var duplicateDb = duplicateScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Assert.Single(duplicateDb.Customers.Where(x => x.Email == "test@example.com"));
+
         var menuItemPage = await admin.GetStringAsync("/meni/create");
         var menuItemToken = ExtractAntiForgeryToken(menuItemPage);
         var invalidMenuItem = await admin.PostAsync("/meni/create", new FormUrlEncodedContent(new Dictionary<string, string>
@@ -627,8 +653,8 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
 
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<FoodOrderingLab2.Data.ApplicationDbContext>();
-        Assert.Empty(db.Restaurants);
-        Assert.Empty(db.MenuItems);
+        Assert.Single(db.Restaurants);
+        Assert.Equal(2, db.MenuItems.Count());
     }
 
     [Fact]

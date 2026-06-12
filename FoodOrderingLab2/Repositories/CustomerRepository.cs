@@ -35,6 +35,14 @@ namespace FoodOrderingLab2.Repositories
                 .FirstOrDefault(c => c.AppUserId == appUserId);
         }
 
+        public bool EmailExists(string email, int? excludingCustomerId = null)
+        {
+            var normalizedEmail = email.Trim().ToUpper();
+            return _context.Customers.Any(c =>
+                c.Email.ToUpper() == normalizedEmail &&
+                (!excludingCustomerId.HasValue || c.CustomerId != excludingCustomerId.Value));
+        }
+
         public void Add(Customer customer)
         {
             _context.Customers.Add(customer);

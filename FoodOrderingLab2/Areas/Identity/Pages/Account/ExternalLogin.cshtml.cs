@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodOrderingLab2.Areas.Identity.Pages.Account;
 
@@ -61,6 +62,13 @@ public class ExternalLoginModel(
         var info = await signInManager.GetExternalLoginInfoAsync();
         if (info == null) return RedirectToPage("./Login");
         if (!ModelState.IsValid) return Page();
+        var normalizedEmail = Input.Email.Trim().ToUpper();
+        if (await db.Customers.AnyAsync(x => x.Email.ToUpper() == normalizedEmail))
+        {
+            ModelState.AddModelError("Input.Email", "Kupac s ovim emailom već postoji.");
+            ProviderDisplayName = info.ProviderDisplayName;
+            return Page();
+        }
 
         var user = new AppUser { UserName = Input.Email, Email = Input.Email, OIB = Input.OIB, JMBG = Input.JMBG };
         var result = await userManager.CreateAsync(user);

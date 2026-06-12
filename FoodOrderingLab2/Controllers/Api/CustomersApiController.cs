@@ -33,6 +33,7 @@ public class CustomersApiController(ApplicationDbContext db, UserManager<AppUser
     [Authorize(Roles = "Admin,Manager"), HttpPost]
     public async Task<ActionResult<CustomerDto>> Create(CustomerRequest request)
     {
+        if (await EmailExists(request.Email)) return Conflict("Kupac s ovim emailom već postoji.");
         var value = new Customer();
         Apply(request, value);
         db.Customers.Add(value);
@@ -45,6 +46,7 @@ public class CustomersApiController(ApplicationDbContext db, UserManager<AppUser
     {
         var value = await db.Customers.FindAsync(id);
         if (value == null) return NotFound();
+        if (await EmailExists(request.Email, id)) return Conflict("Kupac s ovim emailom već postoji.");
         Apply(request, value);
         await db.SaveChangesAsync();
         return Ok(value.ToDto());
@@ -78,5 +80,13 @@ public class CustomersApiController(ApplicationDbContext db, UserManager<AppUser
         value.Phone = request.Phone;
         value.Address = request.Address;
         value.RegisterDate = request.RegisterDate;
+    }
+
+    private Task<bool> EmailExists(string email, int? excludingCustomerId = null)
+    {
+        var normalizedEmail = email.Trim().ToUpper();
+        return db.Customers.AnyAsync(x =>
+            x.Email.ToUpper() == normalizedEmail &&
+            (!excludingCustomerId.HasValue || x.CustomerId != excludingCustomerId.Value));
     }
 }
