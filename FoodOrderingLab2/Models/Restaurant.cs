@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using FoodOrderingLab2.Validation;
 
 namespace FoodOrderingLab2.Models
 {
@@ -11,7 +12,7 @@ namespace FoodOrderingLab2.Models
         public string Name { get; set; } = null!;
         [Required, StringLength(300)]
         public string Address { get; set; } = null!;
-        [Required, Phone, StringLength(50)]
+        [Required, Phone, CroatianPhone, StringLength(50)]
         public string Phone { get; set; } = null!;
         [Required, EmailAddress, StringLength(256)]
         public string Email { get; set; } = null!;

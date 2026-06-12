@@ -3,6 +3,28 @@
         var canManage = document.body.dataset.canManage === 'true';
         var canDelete = document.body.dataset.canDelete === 'true';
 
+        function formatCroatianPhone(value) {
+            var digits = String(value || '').replace(/\D/g, '');
+            if (digits.indexOf('385') === 0) digits = digits.substring(3);
+            else if (digits.indexOf('0') === 0) digits = digits.substring(1);
+
+            if (/^1\d{7}$/.test(digits)) {
+                return '+385 ' + digits.substring(0, 1) + ' ' + digits.substring(1, 4) + ' ' + digits.substring(4);
+            }
+            if (/^[2-5]\d{7}$/.test(digits)) {
+                return '+385 ' + digits.substring(0, 2) + ' ' + digits.substring(2, 5) + ' ' + digits.substring(5);
+            }
+            if (/^9\d{8}$/.test(digits)) {
+                return '+385 ' + digits.substring(0, 2) + ' ' + digits.substring(2, 5) + ' ' + digits.substring(5);
+            }
+            return value;
+        }
+
+        $(document).on('blur', 'input[type="tel"]', function () {
+            this.value = formatCroatianPhone(this.value);
+            $(this).trigger('change');
+        });
+
         function renderCards($container, template, items){
             $container.toggleClass('has-search-results', Array.isArray(items) && items.length > 0);
 

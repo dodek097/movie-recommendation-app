@@ -33,6 +33,9 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
 
         request.LastName = "Promijenjeno";
         Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync($"/api/customers/{created.CustomerId}", request)).StatusCode);
+        request.Phone = "2342353";
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/customers", request)).StatusCode);
+        request.Phone = "+385 91 222 2222";
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/customers", new CustomerRequest())).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest,
             (await client.PutAsJsonAsync($"/api/customers/{created.CustomerId}", new CustomerRequest())).StatusCode);
@@ -62,6 +65,9 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync($"/api/restaurants/{created.RestaurantId}")).StatusCode);
         request.Rating = 4.8m;
         Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync($"/api/restaurants/{created.RestaurantId}", request)).StatusCode);
+        request.Phone = "2342353";
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/restaurants", request)).StatusCode);
+        request.Phone = "+385 1 222 2222";
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/restaurants", new RestaurantRequest())).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest,
             (await client.PutAsJsonAsync($"/api/restaurants/{created.RestaurantId}", new RestaurantRequest())).StatusCode);
@@ -583,6 +589,8 @@ public class ApiCrudIntegrationTests(ApiWebApplicationFactory factory) : IClassF
         var register = await anonymous.GetStringAsync("/Identity/Account/Register");
         Assert.Contains("type=\"tel\"", register);
         Assert.Contains("+385 91 123 4567", register);
+        Assert.Contains("Koristi hrvatski format", register);
+        Assert.Contains("data-val-regex-pattern", register);
 
         using var admin = factory.CreateAdminClient();
         var restaurantPage = await admin.GetStringAsync("/restorani/create");

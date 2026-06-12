@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using FoodOrderingLab2.Models;
 using FoodOrderingLab2.Data;
+using FoodOrderingLab2.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ public class RegisterModel(
         [Required, StringLength(13, MinimumLength = 13), RegularExpression("^[0-9]*$"), Display(Name = "JMBG")] public string JMBG { get; set; } = null!;
         [Required, StringLength(100), Display(Name = "Ime")] public string FirstName { get; set; } = null!;
         [Required, StringLength(100), Display(Name = "Prezime")] public string LastName { get; set; } = null!;
-        [Required, Phone, StringLength(50), RegularExpression(@"^\+?[0-9][0-9\s()\-]{6,49}$", ErrorMessage = "Unesi valjan broj telefona."), Display(Name = "Telefon")] public string Phone { get; set; } = null!;
+        [Required, Phone, CroatianPhone, StringLength(50), Display(Name = "Telefon")] public string Phone { get; set; } = null!;
         [Required, StringLength(300), Display(Name = "Adresa")] public string Address { get; set; } = null!;
     }
 

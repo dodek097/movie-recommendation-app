@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using FoodOrderingLab2.Validation;
 
 namespace FoodOrderingLab2.ViewModels
 {
@@ -15,8 +16,7 @@ namespace FoodOrderingLab2.ViewModels
         [Required, EmailAddress, StringLength(256)]
         public string Email { get; set; } = null!;
 
-        [Required, Phone, StringLength(50)]
-        [RegularExpression(@"^\+?[0-9][0-9\s()\-]{6,49}$", ErrorMessage = "Unesi valjan broj telefona.")]
+        [Required, Phone, CroatianPhone, StringLength(50)]
         [Display(Name = "Telefon")]
         public string Phone { get; set; } = null!;
 
